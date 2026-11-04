@@ -1,0 +1,4 @@
+﻿"activityId";"leadId";"cliente";"imovel";"data";"etapa";"descricao";"corretor";"proximoContato";"tempoRespostaMin"
+"ATD-101";"";"Mariana Souza";"Apartamento 203";"2026-10-28 10:30";"Visita";"Visita agendada";"Carlos Lima";"2026-11-02";"18"
+"ATD-102";"";"Pedro Pereira";"Casa 10";"2026-10-29 13:00";"Contato inicial";"Primeiro contato";"Juliana Costa";"2026-11-03";"22"
+"ATD-103";"";"Ricardo Alves";"Apartamento 203";"2026-10-30 09:00";"Proposta";"Proposta enviada";"Carlos Lima";"2026-11-02";"15"

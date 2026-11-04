@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f4f5;color:#161719;font-family:Geist,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3d4045}a:hover{color:#161719}
+button,input,select{font:inherit}
+</style>
+</helmet>
+
+<sc-if value="{{ is.login }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Login" style="min-height:100vh;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);background:#f4f4f5">
+  <div style="background:#2c2d30;color:#f4f4f5;padding:48px 56px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+    <div style="font-size:24px;font-weight:700;letter-spacing:-0.6px">ImobiInsight</div>
+    <div style="display:flex;flex-direction:column;gap:18px;max-width:520px">
+      <div style="font-size:44px;line-height:1.05;font-weight:600;letter-spacing:-1.4px;text-wrap:pretty">Gestão comercial e inteligência</div>
+      <div style="font-size:17px;line-height:1.5;color:#b9bbc0;text-wrap:pretty">Leads, atendimentos, agenciamentos e resultados financeiros reunidos em um só painel.</div>
+    </div>
+    <div style="height:15px"></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;padding:40px">
+    <div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:28px;font-weight:600;letter-spacing:-0.8px">Entrar</div>
+        <div style="font-size:15px;color:#6b6e74">Acesse com o e-mail cadastrado pela imobiliária.</div>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:7px;font-size:14px;color:#44474c">E-mail
+        <input name="loginEmail" placeholder="socio@imobiliaria.com.br" style="height:46px;border:1px solid #d6d7da;border-radius:10px;padding:0 14px;background:#fff;font-size:15px;color:#161719">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:7px;font-size:14px;color:#44474c">Senha
+        <input name="loginPass" type="password" placeholder="Mínimo de 6 caracteres" style="height:46px;border:1px solid #d6d7da;border-radius:10px;padding:0 14px;background:#fff;font-size:15px">
+      </label>
+      <sc-if value="{{ hasLoginErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:13.5px;color:#8a3f34;background:#f6ece9;border-radius:8px;padding:9px 12px">{{ loginErr }}</div></sc-if>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#55585d">
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" checked="">Manter conectado</label>
+        <button type="button" onClick="{{ openM.senha }}" style="border:0;background:transparent;padding:0;font-size:14px;color:#3d4045;text-decoration:underline;cursor:pointer">Esqueci a senha</button>
+      </div>
+      <button onClick="{{ doLogin }}" style="height:48px;border:0;border-radius:10px;background:#2c2d30;color:#fff;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#45474b">Entrar</button>
+      <div style="font-size:13px;color:#6b6e74;line-height:1.5;border-top:1px solid #e3e3e6;padding-top:16px">O perfil de acesso (sócio, gerente, administrativo ou corretor) define quais módulos aparecem após o login.</div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.app }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh">
+  <aside style="background:#ececee;border-right:1px solid #dedfe2;padding:22px 12px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh">
+    <div style="font-size:21px;font-weight:700;letter-spacing:-0.6px;padding:0 10px">ImobiInsight</div>
+    <nav style="display:flex;flex-direction:column;gap:18px;flex:1;overflow:auto">
+      <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:#80838a;padding:0 10px 6px">{{ g.label }}</div>
+          <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="3">
+            <button onClick="{{ n.go }}" style="border:0;text-align:left;padding:9px 10px;border-radius:8px;font-size:14.5px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:{{ n.bg }};color:{{ n.fg }};font-weight:{{ n.fw }}">{{ n.label }}<span style="font-family:'Geist Mono',monospace;font-size:11px;opacity:.7">{{ n.count }}</span></button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </nav>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;border-top:1px solid #dcdde0">
+      <div style="width:34px;height:34px;border-radius:50%;background:#8e9095;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:600">VM</div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+        <span style="font-size:14px;font-weight:600">Vanessa M.</span>
+        <span style="font-size:12px;color:#6b6e74">{{ roleName }}</span>
+      </div>
+      <button onClick="{{ nav.login }}" style="border:0;background:transparent;font-size:12px;color:#55585d;cursor:pointer">Sair</button>
+    </div>
+  </aside>
+
+  <div style="min-width:0;display:flex;flex-direction:column">
+    <header style="min-height:68px;border-bottom:1px solid #e3e3e6;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 28px;background:#f4f4f5;position:sticky;top:0;z-index:5">
+      <div style="flex:1 1 220px;min-width:0;max-width:520px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #dcdde0;border-radius:10px;padding:0 14px;height:40px">
+        <div style="width:12px;height:12px;border:1.6px solid #6b6e74;border-radius:50%"></div>
+        <input value="{{ q }}" onChange="{{ setQ }}" placeholder="Buscar cliente, imóvel, bairro ou código" style="border:0;outline:none;flex:1;min-width:0;font-size:14px;background:transparent">
+        <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#8d9096;border:1px solid #e3e3e6;border-radius:5px;padding:2px 6px">⌘K</span>
+      </div>
+      <select value="{{ period }}" onChange="{{ setPeriod }}" style="height:40px;border:1px solid #dcdde0;border-radius:10px;background:#fff;padding:0 12px;font-size:14px;color:#2e3135">
+        <option value="1">Outubro 2026</option><option value="3">Últimos 3 meses</option><option value="6">Últimos 6 meses</option>
+      </select>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <select onChange="{{ setRole }}" value="{{ role }}" style="height:40px;border:1px solid #dcdde0;border-radius:10px;background:#fff;padding:0 12px;font-size:14px">
+          <option value="socio">Sócio / Gestor</option><option value="locacoes">Gerente de locações</option><option value="admin">Administrativo</option><option value="corretor">Corretor</option>
+        </select>
+        <button style="position:relative;width:40px;height:40px;border:1px solid #dcdde0;border-radius:10px;background:#fff;cursor:pointer;font-size:15px">◔<span style="position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#b0573f"></span></button>
+      </div>
+    </header>
+
+    <sc-if value="{{ showNotice }}" hint-placeholder-val="{{ true }}">
+      <div style="margin:16px 28px 0;padding:10px 14px;border-radius:10px;background:#fbf6ea;border:1px solid #eadfc2;color:#6a5321;font-size:13px">Ambiente demonstrativo com dados fictícios. Os números servem para avaliar a proposta com os sócios.</div>
+    </sc-if>
+
+    <main style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:20px;min-width:0">
+
+<!-- DASHBOARD -->
+<sc-if value="{{ is.dashboard }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Dashboard" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Painel gerencial</h1>
+      <div style="font-size:15px;color:#6b6e74">Dados importados dos CSVs · {{ periodLabel }}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button style="height:38px;padding:0 14px;white-space:nowrap;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Exportar</button>
+      <button onClick="{{ openM.lead }}" style="height:38px;padding:0 14px;white-space:nowrap;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;cursor:pointer">+ Novo lead</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+    <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:14px;color:#55585d">{{ k.label }}</div>
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div style="font-size:40px;font-weight:600;letter-spacing:-1.4px;line-height:1;font-variant-numeric:tabular-nums">{{ k.value }}</div>
+          <div style="font-size:13px;color:#5f7a5a;font-weight:500">{{ k.trend }}</div>
+        </div>
+        <div style="font-size:13px;color:#6b6e74">{{ k.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px">
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-size:16px;font-weight:600">Etapas do atendimento</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:110px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:13.5px">
+            <span style="color:#44474c">{{ f.label }}</span>
+            <div style="height:22px;background:#f1f1f3;border-radius:5px;overflow:hidden"><div style="height:100%;width:{{ f.pct }};background:{{ f.color }};border-radius:5px"></div></div>
+            <span style="text-align:right;font-variant-numeric:tabular-nums"><b>{{ f.n }}</b> <span style="color:#8d9096">{{ f.pct }}</span></span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size:13px;color:#6b6e74">{{ funnelNote }}</div>
+    </div>
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-size:16px;font-weight:600">Origem dos contratos fechados</div>
+      <div style="display:flex;height:14px;border-radius:7px;overflow:hidden;gap:2px">
+        <sc-for list="{{ origins }}" as="o" hint-placeholder-count="5"><div style="width:{{ o.pctS }};background:{{ o.color }}"></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ origins }}" as="o" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px">
+            <span style="width:10px;height:10px;border-radius:3px;background:{{ o.color }}"></span>
+            <span style="flex:1;color:#2e3135">{{ o.name }}</span>
+            <span style="color:#6b6e74;font-variant-numeric:tabular-nums">{{ o.n }}</span>
+            <b style="width:40px;text-align:right;font-variant-numeric:tabular-nums">{{ o.pctS }}</b>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:16px;font-weight:600">Tempo médio de resposta</div>
+        <span style="font-size:12px;padding:4px 8px;border-radius:6px;background:#e9efe7;color:#4b6446">{{ respBadge }}</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:44px;font-weight:600;letter-spacing:-1.4px;line-height:1">{{ respAvg }}</span><span style="font-size:16px;color:#6b6e74">min</span></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:120px;border-bottom:1px solid #e3e3e6">
+        <sc-for list="{{ responseWeeks }}" as="w" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+            <span style="font-size:12px;color:#55585d;font-variant-numeric:tabular-nums">{{ w.v }}</span>
+            <div style="width:100%;max-width:34px;height:{{ w.h }};background:#a9abb0;border-radius:4px 4px 0 0"></div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;font-family:'Geist Mono',monospace;font-size:11px;color:#80838a;text-align:center">
+        <sc-for list="{{ responseWeeks }}" as="w" hint-placeholder-count="5"><span>{{ w.d }}</span></sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:hidden;min-width:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px">
+        <div style="font-size:16px;font-weight:600">Atendimentos recentes</div>
+        <button onClick="{{ nav.leads }}" style="border:0;background:transparent;font-size:13px;color:#44474c;cursor:pointer">Ver todos →</button>
+      </div>
+      <div style="overflow:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left">
+            <th style="padding:10px 20px;font-weight:500">Cliente</th><th style="padding:10px;font-weight:500">Imóvel</th><th style="padding:10px;font-weight:500">Corretor</th><th style="padding:10px;font-weight:500">Etapa</th><th style="padding:10px 20px;font-weight:500">Última interação</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ recentLeads }}" as="l" hint-placeholder-count="5">
+              <tr onClick="{{ l.open }}" style="border-top:1px solid #efeff1;cursor:pointer" style-hover="background:#fafafa">
+                <td style="padding:12px 20px;font-weight:500">{{ l.cliente }}</td>
+                <td style="padding:12px 10px">{{ l.imovel }}<div style="font-size:12.5px;color:#80838a">{{ l.bairro }}</div></td>
+                <td style="padding:12px 10px;color:#44474c">{{ l.corretor }}</td>
+                <td style="padding:12px 10px"><span style="padding:4px 9px;border-radius:6px;font-size:12.5px;white-space:nowrap;background:{{ l.sBg }};color:{{ l.sFg }}">{{ l.etapa }}</span></td>
+                <td style="padding:12px 20px;color:#55585d;font-variant-numeric:tabular-nums;white-space:nowrap">{{ l.ultima }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:16px;font-weight:600">VGV por corretor · mai a out</div>
+        <sc-for list="{{ agentBars }}" as="a" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:110px minmax(0,1fr) 84px;gap:10px;align-items:center;font-size:14px">
+            <span>{{ a.name }}</span>
+            <div style="height:10px;background:#f1f1f3;border-radius:5px;overflow:hidden"><div style="height:100%;width:{{ a.pct }};background:#6f7176;border-radius:5px"></div></div>
+            <b style="text-align:right;font-variant-numeric:tabular-nums">{{ a.val }}</b>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:16px;font-weight:600">Próximo contato vencido</div>
+          <span style="font-size:12px;padding:4px 8px;border-radius:6px;background:#f6ece9;color:#8a3f34">{{ lateCount }}</span>
+        </div>
+        <sc-for list="{{ noReturn }}" as="r" hint-placeholder-count="3">
+          <div onClick="{{ r.open }}" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #efeff1;cursor:pointer">
+            <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">{{ r.cliente }}</div><div style="font-size:12.5px;color:#80838a">{{ r.imovel }} · {{ r.corretor }}</div></div>
+            <span style="font-size:12.5px;color:#8a3f34;white-space:nowrap">{{ r.dias }}</span>
+          </div>
+        </sc-for>
+        <button onClick="{{ nav.leads }}" style="border:0;background:transparent;text-align:left;padding:8px 0 0;font-size:13px;color:#44474c;cursor:pointer">Ver pendentes →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- LEADS -->
+<sc-if value="{{ is.leads }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Leads" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Leads</h1>
+      <div style="font-size:15px;color:#6b6e74">{{ leadsSub }}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onClick="{{ nav.importacoes }}" style="height:38px;padding:0 14px;white-space:nowrap;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Importar CSV</button>
+      <button style="height:38px;padding:0 14px;white-space:nowrap;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Exportar</button>
+      <button type="button" onClick="{{ openM.lead }}" style="height:38px;padding:0 14px;white-space:nowrap;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;cursor:pointer">+ Novo lead</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <sc-for list="{{ stageFilters }}" as="s" hint-placeholder-count="6">
+      <button onClick="{{ s.pick }}" style="height:34px;padding:0 12px;border-radius:8px;font-size:13.5px;cursor:pointer;border:1px solid {{ s.bd }};background:{{ s.bg }};color:{{ s.fg }}">{{ s.label }} <span style="opacity:.6">{{ s.n }}</span></button>
+    </sc-for>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <select value="{{ fCor }}" onChange="{{ setFCor }}" style="height:34px;border:1px solid #d6d7da;border-radius:8px;background:#fff;padding:0 10px;font-size:13.5px"><option value="">Todos os corretores</option><sc-for list="{{ corretorOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select>
+      <select value="{{ fOrig }}" onChange="{{ setFOrig }}" style="height:34px;border:1px solid #d6d7da;border-radius:8px;background:#fff;padding:0 10px;font-size:13.5px"><option value="">Todas as origens</option><sc-for list="{{ origemOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select>
+      <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearFilters }}" style="height:34px;padding:0 12px;border:0;border-radius:8px;background:transparent;font-size:13.5px;color:#44474c;text-decoration:underline;cursor:pointer">Limpar filtros</button></sc-if>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:900px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left">
+        <th style="padding:11px 20px;font-weight:500">Cliente</th><th style="padding:11px 10px;font-weight:500">Imóvel</th><th style="padding:11px 10px;font-weight:500">Origem</th><th style="padding:11px 10px;font-weight:500">Corretor</th><th style="padding:11px 10px;font-weight:500">Etapa</th><th style="padding:11px 10px;font-weight:500">Próximo contato</th><th style="padding:11px 20px;font-weight:500">Última interação</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ leadsFiltered }}" as="l" hint-placeholder-count="8">
+          <tr onClick="{{ l.open }}" style="border-top:1px solid #efeff1;cursor:pointer" style-hover="background:#fafafa">
+            <td style="padding:12px 20px"><div style="font-weight:500">{{ l.cliente }}</div><div style="font-size:12.5px;color:#80838a;font-variant-numeric:tabular-nums">{{ l.tel }}</div></td>
+            <td style="padding:12px 10px">{{ l.imovel }}<div style="font-size:12.5px;color:#80838a">{{ l.bairro }}</div></td>
+            <td style="padding:12px 10px;color:#44474c">{{ l.origem }}</td>
+            <td style="padding:12px 10px;color:#44474c">{{ l.corretor }}</td>
+            <td style="padding:12px 10px"><span style="padding:4px 9px;border-radius:6px;font-size:12.5px;white-space:nowrap;background:{{ l.sBg }};color:{{ l.sFg }}">{{ l.etapa }}</span></td>
+            <td style="padding:12px 10px;font-variant-numeric:tabular-nums;color:{{ l.nextFg }}">{{ l.proximo }}</td>
+            <td style="padding:12px 20px;color:#55585d;font-variant-numeric:tabular-nums;white-space:nowrap">{{ l.ultima }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <sc-if value="{{ leadsEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:28px 20px;text-align:center;font-size:14px;color:#6b6e74;border-top:1px solid #efeff1">Nenhum lead encontrado com os filtros atuais.</div></sc-if>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-top:1px solid #efeff1;font-size:13px;color:#6b6e74">
+      <span>Mostrando {{ leadsCount }} de {{ leadsTotal }}</span>
+      <div style="display:flex;gap:6px"><button style="height:30px;padding:0 10px;border:1px solid #d6d7da;border-radius:7px;background:#fff;cursor:pointer">Anterior</button><button style="height:30px;padding:0 10px;border:1px solid #d6d7da;border-radius:7px;background:#fff;cursor:pointer">Próxima</button></div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- FUNIL -->
+<sc-if value="{{ is.funil }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Funil" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Funil de atendimento</h1>
+      <div style="font-size:15px;color:#6b6e74">Arraste os cartões para mudar a etapa do lead.</div>
+    </div>
+    <select value="{{ fCor }}" onChange="{{ setFCor }}" style="height:38px;border:1px solid #d6d7da;border-radius:9px;background:#fff;padding:0 12px;font-size:14px"><option value="">Todos os corretores</option><sc-for list="{{ corretorOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:12px;overflow:auto;padding-bottom:6px">
+    <sc-for list="{{ lanes }}" as="lane" hint-placeholder-count="5">
+      <div style="background:#ececee;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:480px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 4px 6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><span style="width:8px;height:8px;border-radius:50%;background:{{ lane.dot }}"></span>{{ lane.name }}</div>
+          <span style="font-family:'Geist Mono',monospace;font-size:12px;color:#6b6e74">{{ lane.total }}</span>
+        </div>
+        <sc-for list="{{ lane.cards }}" as="c" hint-placeholder-count="3">
+          <div onClick="{{ c.open }}" style="background:#fff;border:1px solid #e3e3e6;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;cursor:grab" style-hover="border-color:#c3c4c8">
+            <div style="font-size:14px;font-weight:600">{{ c.cliente }}</div>
+            <div style="font-size:13px;color:#55585d">{{ c.imovel }} · {{ c.bairro }}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#80838a;padding-top:4px">
+              <span>{{ c.corretor }}</span><span style="font-variant-numeric:tabular-nums">{{ c.ultima }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ lane.empty }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#80838a;padding:8px 4px">Nenhum lead nesta etapa</div></sc-if>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<!-- DETALHE DO LEAD -->
+<sc-if value="{{ is.lead }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Detalhe do lead" style="display:flex;flex-direction:column;gap:18px">
+  <button onClick="{{ nav.leads }}" style="align-self:flex-start;border:0;background:transparent;padding:0;font-size:13.5px;color:#55585d;cursor:pointer">← Leads</button>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;gap:16px;align-items:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:#d6d7da;display:grid;place-items:center;font-size:18px;font-weight:600;color:#44474c">{{ lead.ini }}</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h1 style="margin:0;font-size:28px;font-weight:600;letter-spacing:-0.8px">{{ lead.cliente }}</h1>
+        <div style="font-size:14px;color:#6b6e74">{{ lead.tel }} · Origem: {{ lead.origem }} · Responsável: {{ lead.corretor }}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button style="height:38px;padding:0 14px;white-space:nowrap;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Ligar</button>
+      <button style="height:38px;padding:0 14px;white-space:nowrap;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">WhatsApp</button>
+      <button type="button" onClick="{{ openM.interacao }}" style="height:38px;padding:0 14px;white-space:nowrap;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;cursor:pointer">Registrar interação</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:4px;background:#fff;border:1px solid #e3e3e6;border-radius:12px;padding:6px;overflow:auto">
+    <sc-for list="{{ lead.steps }}" as="st" hint-placeholder-count="5">
+      <div style="flex:1;min-width:120px;padding:10px 12px;border-radius:8px;font-size:13.5px;text-align:center;background:{{ st.bg }};color:{{ st.fg }};font-weight:{{ st.fw }}">{{ st.label }}</div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-size:16px;font-weight:600">Histórico de interações</div>
+      <div style="display:flex;gap:10px;align-items:flex-start;border:1px solid #e3e3e6;border-radius:10px;padding:12px">
+        <input placeholder="Anotar contato, visita ou retorno do cliente…" style="flex:1;border:0;outline:none;font-size:14px">
+        <button style="height:32px;padding:0 12px;border:0;border-radius:7px;background:#2c2d30;color:#fff;font-size:13px;cursor:pointer">Salvar</button>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ timeline }}" as="t" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:18px minmax(0,1fr);gap:12px">
+            <div style="display:flex;flex-direction:column;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:{{ t.dot }};margin-top:5px"></span><span style="flex:1;width:1px;background:#e3e3e6"></span></div>
+            <div style="padding-bottom:18px;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><b style="font-size:14px">{{ t.title }}</b><span style="font-size:12.5px;color:#80838a">{{ t.when }} · {{ t.who }}</span></div>
+              <div style="font-size:14px;color:#44474c;line-height:1.45">{{ t.text }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:16px;font-weight:600">Próxima ação</div>
+        <div style="padding:12px;border-radius:10px;background:#f7f7f8;display:flex;flex-direction:column;gap:4px"><b style="font-size:14px">{{ lead.obs }}</b><span style="font-size:13px;color:#6b6e74">Previsto para {{ lead.proximo }} · {{ lead.corretor }}</span></div>
+        <button type="button" onClick="{{ openM.interacao }}" style="height:36px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:13.5px;cursor:pointer">Reagendar</button>
+      </div>
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:16px;font-weight:600">Imóvel de interesse</div>
+        <div style="height:120px;border-radius:10px;background:repeating-linear-gradient(135deg,#f1f1f3 0 8px,#e8e8eb 8px 16px);display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:11px;color:#80838a">foto do imóvel</div>
+        <b style="font-size:14px">{{ lead.imovel }} · {{ lead.bairro }}</b>
+        <span style="font-size:13px;color:#6b6e74">{{ lead.propLine }}</span>
+      </div>
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:#80838a">Entrada</span><b>{{ lead.created }}</b></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:#80838a">1ª resposta</span><b>{{ lead.firstResp }}</b></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:#80838a">Origem</span><b>{{ lead.origem }}</b></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:#80838a">Próximo contato</span><b>{{ lead.status }}</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- IMÓVEIS -->
+<sc-if value="{{ is.imoveis }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Imóveis" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Imóveis</h1>
+      <div style="font-size:15px;color:#6b6e74">{{ propSub }}</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <select value="{{ fMod }}" onChange="{{ setFMod }}" style="height:38px;border:1px solid #d6d7da;border-radius:9px;background:#fff;padding:0 12px;font-size:14px"><option value="">Venda e locação</option><option value="Venda">Venda</option><option value="Locação">Locação</option></select>
+      <button type="button" onClick="{{ openM.imovel }}" style="height:38px;padding:0 14px;white-space:nowrap;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;cursor:pointer">+ Cadastrar imóvel</button>
+    </div>
+  </div>
+  <sc-if value="{{ propsEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:32px;text-align:center;font-size:14px;color:#6b6e74;background:#fff;border:1px solid #e3e3e6;border-radius:14px">Nenhum imóvel encontrado com os filtros atuais.</div></sc-if>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+    <sc-for list="{{ properties }}" as="p" hint-placeholder-count="6">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:150px;background:repeating-linear-gradient(135deg,#f1f1f3 0 8px,#e8e8eb 8px 16px);display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:11px;color:#80838a;position:relative">foto do imóvel
+          <span style="position:absolute;top:10px;left:10px;padding:4px 8px;border-radius:6px;font-family:Geist,sans-serif;font-size:12px;background:{{ p.sBg }};color:{{ p.sFg }}">{{ p.status }}</span>
+        </div>
+        <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:15px">{{ p.name }}</b><span style="font-family:'Geist Mono',monospace;font-size:11.5px;color:#80838a">{{ p.code }}</span></div>
+          <div style="font-size:13.5px;color:#6b6e74">{{ p.bairro }} · {{ p.owner }}</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:6px">
+            <span style="font-size:18px;font-weight:600;letter-spacing:-0.4px">{{ p.price }}</span>
+            <span style="font-size:12.5px;color:#55585d">{{ p.meta }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<!-- AGENCIAMENTOS -->
+<sc-if value="{{ is.agenciamentos }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Agenciamentos" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Agenciamentos e captação</h1>
+      <div style="font-size:15px;color:#6b6e74">Novos imóveis captados por corretor e agenciador · {{ periodLabel }}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onClick="{{ nav.importacoes }}" style="height:38px;padding:0 14px;white-space:nowrap;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Importar CSV do portal</button>
+      <button type="button" onClick="{{ openM.agenciamento }}" style="height:38px;padding:0 14px;white-space:nowrap;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;cursor:pointer">+ Novo agenciamento</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+    <sc-for list="{{ agKpis }}" as="k" hint-placeholder-count="4">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:14px;color:#55585d">{{ k.label }}</div>
+        <div style="font-size:36px;font-weight:600;letter-spacing:-1.2px;line-height:1">{{ k.value }}</div>
+        <div style="font-size:13px;color:#6b6e74">{{ k.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px">
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="font-size:16px;font-weight:600">Captações nos últimos 6 meses</div>
+        <div style="display:flex;gap:14px;font-size:12.5px;color:#55585d"><span style="display:flex;gap:6px;align-items:center"><span style="width:10px;height:10px;border-radius:3px;background:#5b5d62"></span>Venda</span><span style="display:flex;gap:6px;align-items:center"><span style="width:10px;height:10px;border-radius:3px;background:#c4c5c9"></span>Locação</span></div>
+      </div>
+      <sc-for list="{{ agHist }}" as="h" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 56px;gap:10px;align-items:center;font-size:13px">
+          <span style="font-family:'Geist Mono',monospace;color:#6b6e74">{{ h.m }}</span>
+          <div style="display:flex;height:18px;gap:2px"><div style="width:{{ h.sw }};background:#5b5d62;border-radius:4px 0 0 4px"></div><div style="width:{{ h.lw }};background:#c4c5c9;border-radius:0 4px 4px 0"></div></div>
+          <span style="text-align:right;font-variant-numeric:tabular-nums"><b>{{ h.s }}</b> / {{ h.l }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:16px;font-weight:600">Meta semanal da roleta de leads</div>
+      <div style="font-size:13px;color:#6b6e74;line-height:1.45">Referência: 3 captações de venda na semana anterior (19 a 25/10) para participar da distribuição.</div>
+      <sc-for list="{{ agWeekly }}" as="w" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 92px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #efeff1;font-size:14px">
+          <span>{{ w.name }}</span>
+          <div style="display:flex;gap:4px">
+            <sc-for list="{{ w.dots }}" as="d" hint-placeholder-count="3"><span style="width:22px;height:8px;border-radius:4px;background:{{ d.c }}"></span></sc-for>
+          </div>
+          <span style="font-size:12.5px;text-align:right;color:{{ w.fg }}">{{ w.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <div style="padding:18px 20px;font-size:16px;font-weight:600">Novos imóveis cadastrados</div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:820px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left">
+        <th style="padding:10px 20px;font-weight:500">Data</th><th style="padding:10px;font-weight:500">Código</th><th style="padding:10px;font-weight:500">Imóvel</th><th style="padding:10px;font-weight:500">Modalidade</th><th style="padding:10px;font-weight:500">Corretor</th><th style="padding:10px;font-weight:500">Agenciador</th><th style="padding:10px;font-weight:500;text-align:right">Valor</th><th style="padding:10px 20px;font-weight:500">Situação</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ agRows }}" as="r" hint-placeholder-count="6">
+          <tr style="border-top:1px solid #efeff1">
+            <td style="padding:11px 20px;font-variant-numeric:tabular-nums;color:#55585d">{{ r.data }}</td>
+            <td style="padding:11px 10px;font-family:'Geist Mono',monospace;font-size:12.5px">{{ r.code }}</td>
+            <td style="padding:11px 10px">{{ r.imovel }}<div style="font-size:12.5px;color:#80838a">{{ r.bairro }}</div></td>
+            <td style="padding:11px 10px">{{ r.mod }}</td>
+            <td style="padding:11px 10px;color:#44474c">{{ r.corretor }}</td>
+            <td style="padding:11px 10px;color:#44474c">{{ r.agenciador }}</td>
+            <td style="padding:11px 10px;text-align:right;font-variant-numeric:tabular-nums">{{ r.valor }}</td>
+            <td style="padding:11px 20px"><span style="padding:4px 9px;border-radius:6px;font-size:12.5px;white-space:nowrap;background:{{ r.sBg }};color:{{ r.sFg }}">{{ r.status }}</span></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+</div>
+</sc-if>
+
+<!-- CORRETORES -->
+<sc-if value="{{ is.corretores }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Corretores" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Corretores</h1>
+    <div style="font-size:15px;color:#6b6e74">Captações (agenciamentos) e contratos fechados · mai a out/2026</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+    <sc-for list="{{ agents }}" as="a" hint-placeholder-count="4">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="width:42px;height:42px;border-radius:50%;background:#d6d7da;display:grid;place-items:center;font-size:14px;font-weight:600;color:#44474c">{{ a.ini }}</div>
+          <div style="display:flex;flex-direction:column"><b style="font-size:15px">{{ a.name }}</b><span style="font-size:12.5px;color:#6b6e74">{{ a.role }}</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12.5px;color:#80838a">Captações</span><b style="font-size:22px;font-weight:600">{{ a.leads }}</b></div>
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12.5px;color:#80838a">Vendas</span><b style="font-size:22px;font-weight:600">{{ a.visits }}</b></div>
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12.5px;color:#80838a">Locações</span><b style="font-size:22px;font-weight:600">{{ a.closed }}</b></div>
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12.5px;color:#80838a">Comissão</span><b style="font-size:22px;font-weight:600">{{ a.resp }}</b></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#6b6e74"><span>Participação no VGV</span><span>{{ a.conv }}</span></div>
+          <div style="height:6px;background:#f1f1f3;border-radius:3px;overflow:hidden"><div style="height:100%;width:{{ a.convW }};background:#6f7176"></div></div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <div style="padding:18px 20px;font-size:16px;font-weight:600">Ranking por VGV · mai a out</div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left"><th style="padding:10px 20px;font-weight:500">#</th><th style="padding:10px;font-weight:500">Corretor</th><th style="padding:10px;font-weight:500;text-align:right">Vendas</th><th style="padding:10px;font-weight:500;text-align:right">Locações</th><th style="padding:10px;font-weight:500;text-align:right">VGV vendido</th><th style="padding:10px 20px;font-weight:500;text-align:right">Comissão</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ vgvRank }}" as="r" hint-placeholder-count="4">
+          <tr style="border-top:1px solid #efeff1"><td style="padding:12px 20px;font-family:'Geist Mono',monospace;color:#80838a">{{ r.pos }}</td><td style="padding:12px 10px;font-weight:500">{{ r.name }}</td><td style="padding:12px 10px;text-align:right">{{ r.v }}</td><td style="padding:12px 10px;text-align:right">{{ r.l }}</td><td style="padding:12px 10px;text-align:right;font-variant-numeric:tabular-nums;font-weight:600">{{ r.vgv }}</td><td style="padding:12px 20px;text-align:right;font-variant-numeric:tabular-nums">{{ r.com }}</td></tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:3px"><div style="font-size:16px;font-weight:600">Cadastro de corretores e agenciadores</div><div style="font-size:13px;color:#6b6e74">Nomes encontrados nos arquivos importados. Os registros só se ligam quando o nome está cadastrado aqui.</div></div>
+      <button type="button" onClick="{{ openM.corretor }}" style="height:34px;padding:0 12px;border:1px solid #d6d7da;border-radius:8px;background:#fff;font-size:13.5px;cursor:pointer">+ Cadastrar</button>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:720px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left"><th style="padding:10px 20px;font-weight:500">Nome</th><th style="padding:10px;font-weight:500">Função</th><th style="padding:10px;font-weight:500">Aparece em</th><th style="padding:10px 20px;font-weight:500">Situação</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ roster }}" as="p" hint-placeholder-count="6">
+          <tr style="border-top:1px solid #efeff1"><td style="padding:11px 20px;font-weight:500">{{ p.name }}</td><td style="padding:11px 10px;color:#44474c">{{ p.role }}</td><td style="padding:11px 10px;color:#55585d">{{ p.files }}</td><td style="padding:11px 20px"><span style="padding:4px 9px;border-radius:6px;font-size:12.5px;white-space:nowrap;background:{{ p.sBg }};color:{{ p.sFg }}">{{ p.status }}</span></td></tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+</div>
+</sc-if>
+
+<!-- MARKETING -->
+<sc-if value="{{ is.marketing }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Marketing" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Marketing</h1>
+    <div style="font-size:15px;color:#6b6e74">Campanhas importadas e origem dos contratos fechados</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+    <sc-for list="{{ mktKpis }}" as="k" hint-placeholder-count="4">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:14px;color:#55585d">{{ k.label }}</div>
+        <div style="font-size:32px;font-weight:600;letter-spacing:-1px;line-height:1">{{ k.value }}</div>
+        <div style="font-size:13px;color:#6b6e74">{{ k.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:16px;font-weight:600">Contratos fechados por canal de origem</div>
+    <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 90px;gap:12px;font-size:12.5px;color:#80838a"><span>Canal</span><span>Contratos</span><span style="text-align:right">Participação</span></div>
+    <sc-for list="{{ origins }}" as="o" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 90px;gap:12px;align-items:center;font-size:14px">
+        <span>{{ o.name }}</span>
+        <div style="display:flex;align-items:center;gap:8px"><div style="height:14px;width:{{ o.pctW }};background:{{ o.color }};border-radius:4px"></div><span style="font-variant-numeric:tabular-nums;color:#55585d">{{ o.n }}</span></div>
+        <b style="text-align:right">{{ o.pctS }}</b>
+      </div>
+    </sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px"><div style="font-size:16px;font-weight:600">Campanhas</div><button type="button" onClick="{{ openM.campanha }}" style="height:34px;padding:0 12px;border:1px solid #d6d7da;border-radius:8px;background:#fff;font-size:13.5px;cursor:pointer">+ Campanha</button></div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:640px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left"><th style="padding:10px 20px;font-weight:500">Campanha</th><th style="padding:10px;font-weight:500">Canal</th><th style="padding:10px;font-weight:500;text-align:right">Leads</th><th style="padding:10px;font-weight:500;text-align:right">Investimento</th><th style="padding:10px;font-weight:500;text-align:right">Custo/lead</th><th style="padding:10px 20px;font-weight:500;text-align:right">Fechados</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ campaigns }}" as="c" hint-placeholder-count="4">
+          <tr style="border-top:1px solid #efeff1"><td style="padding:12px 20px;font-weight:500">{{ c.nome }}</td><td style="padding:12px 10px;color:#44474c">{{ c.canal }}</td><td style="padding:12px 10px;text-align:right">{{ c.leads }}</td><td style="padding:12px 10px;text-align:right">{{ c.custo }}</td><td style="padding:12px 10px;text-align:right">{{ c.cpl }}</td><td style="padding:12px 20px;text-align:right;font-weight:600">{{ c.fechados }}</td></tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:13px;color:#6b6e74;line-height:1.5">O arquivo de campanhas não informa período, por isso estes números não acompanham o filtro de datas. Incluir colunas de início e fim permite comparar campanhas mês a mês.</div>
+</div>
+</sc-if>
+
+<!-- FINANCEIRO -->
+<sc-if value="{{ is.financeiro }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Financeiro" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Gestão financeira</h1>
+      <div style="font-size:15px;color:#6b6e74">Vendas, locações e caixa em visões separadas · {{ finSub }}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select onChange="{{ setFinMonth }}" value="{{ finMonth }}" style="height:38px;border:1px solid #d6d7da;border-radius:9px;background:#fff;padding:0 12px;font-size:14px"><option value="10">10/2026</option><option value="09">09/2026</option><option value="08">08/2026</option><option value="07">07/2026</option><option value="06">06/2026</option><option value="05">05/2026</option></select>
+      <button type="button" onClick="{{ openM.contrato }}" style="height:38px;padding:0 14px;white-space:nowrap;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">+ Venda / locação</button>
+      <button type="button" onClick="{{ openM.caixa }}" style="height:38px;padding:0 14px;white-space:nowrap;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;cursor:pointer">+ Entrada / saída</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+    <sc-for list="{{ finKpis }}" as="k" hint-placeholder-count="4">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:14px;color:#55585d">{{ k.label }}</div>
+        <div style="font-size:28px;font-weight:600;letter-spacing:-0.8px;line-height:1.05;font-variant-numeric:tabular-nums">{{ k.value }}</div>
+        <div style="font-size:13px;color:#6b6e74">{{ k.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px">
+    <sc-for list="{{ finAreas }}" as="ar" hint-placeholder-count="2">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:16px;font-weight:600;padding-bottom:8px">{{ ar.title }}</div>
+        <sc-for list="{{ ar.rows }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #efeff1;font-size:14px">
+            <div style="display:flex;flex-direction:column;gap:2px"><span>{{ r.label }}</span><span style="font-size:12.5px;color:#80838a">{{ r.note }}</span></div>
+            <b style="font-variant-numeric:tabular-nums;white-space:nowrap">{{ r.value }}</b>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <div style="padding:18px 20px;font-size:16px;font-weight:600">Evolução mensal</div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:760px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:right"><th style="padding:10px 20px;font-weight:500;text-align:left">Mês</th><th style="padding:10px;font-weight:500">VGV vendas</th><th style="padding:10px;font-weight:500">Novos aluguéis</th><th style="padding:10px;font-weight:500">Entradas</th><th style="padding:10px;font-weight:500">Saídas</th><th style="padding:10px 20px;font-weight:500">Saldo</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ finMonths }}" as="m" hint-placeholder-count="6">
+          <tr style="border-top:1px solid #efeff1;text-align:right;font-variant-numeric:tabular-nums"><td style="padding:12px 20px;text-align:left;font-family:'Geist Mono',monospace;font-size:13px">{{ m.m }}</td><td style="padding:12px 10px">{{ m.vgv }}</td><td style="padding:12px 10px">{{ m.alug }}</td><td style="padding:12px 10px">{{ m.ent }}</td><td style="padding:12px 10px">{{ m.sai }}</td><td style="padding:12px 20px;font-weight:600">{{ m.saldo }}</td></tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:13px;color:#6b6e74;line-height:1.5">Novos lançamentos entram como pendentes e só compõem os indicadores após aprovação de um sócio em Governança. Não há apuração contábil de lucro ou impostos.</div>
+</div>
+</sc-if>
+
+<!-- IMPORTAÇÕES -->
+<sc-if value="{{ is.importacoes }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Importações" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Importações</h1>
+    <div style="font-size:15px;color:#6b6e74">Atualize os dados com planilhas CSV exportadas do Excel, portal ou CRM.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-size:16px;font-weight:600">1. Tipo de informação</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px">
+        <sc-for list="{{ importKinds }}" as="ik" hint-placeholder-count="7">
+          <button onClick="{{ ik.pick }}" style="text-align:left;padding:12px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;gap:3px;border:1px solid {{ ik.bd }};background:{{ ik.bg }}">
+            <b style="font-size:14px">{{ ik.title }}</b><span style="font-size:12px;color:#6b6e74">{{ ik.sub }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><div style="font-size:16px;font-weight:600">Colunas de {{ kind.title }}</div><span style="font-family:'Geist Mono',monospace;font-size:12px;color:#6b6e74">{{ kind.file }}</span></div>
+      <div style="border:1px solid #e3e3e6;border-radius:10px;overflow:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px">
+          <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12px;text-align:left"><th style="padding:9px 12px;font-weight:500">Coluna do CSV</th><th style="padding:9px 12px;font-weight:500">Campo no sistema</th><th style="padding:9px 12px;font-weight:500">Exemplo</th><th style="padding:9px 12px;font-weight:500">Preenchimento</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ kind.cols }}" as="c" hint-placeholder-count="6">
+              <tr style="border-top:1px solid #efeff1"><td style="padding:9px 12px;font-family:'Geist Mono',monospace;font-size:12.5px">{{ c.col }}</td><td style="padding:9px 12px">{{ c.field }}</td><td style="padding:9px 12px;color:#55585d">{{ c.ex }}</td><td style="padding:9px 12px;color:{{ c.reqFg }}">{{ c.req }}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <sc-if value="{{ kind.hasWarn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:10px;background:#fbf6ea;border:1px solid #eadfc2">
+          <b style="font-size:13.5px;color:#6a5321">Pontos de atenção encontrados no exemplo</b>
+          <sc-for list="{{ kind.warn }}" as="w" hint-placeholder-count="2"><div style="font-size:13px;color:#6a5321;line-height:1.45">{{ w.t }}</div></sc-for>
+        </div>
+      </sc-if>
+      <div style="font-size:16px;font-weight:600">2. Arquivo</div>
+      <div style="border:1.5px dashed #c3c4c8;border-radius:12px;padding:32px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#fafafa;text-align:center">
+        <b style="font-size:15px">Arraste o CSV aqui ou clique para selecionar</b>
+        <span style="font-size:13px;color:#6b6e74">CSV UTF-8 com ponto e vírgula, vírgula ou tabulação · até 4 MB</span>
+        <div style="display:flex;gap:8px;margin-top:8px"><button style="height:34px;padding:0 12px;border:1px solid #d6d7da;border-radius:8px;background:#fff;font-size:13.5px;cursor:pointer">Baixar modelo</button><button style="height:34px;padding:0 12px;border:1px solid #d6d7da;border-radius:8px;background:#fff;font-size:13.5px;cursor:pointer">Ver exemplo preenchido</button></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:13px;color:#6b6e74">{{ kind.dedupe }}</span>
+        <button style="height:38px;padding:0 14px;white-space:nowrap;border:0;border-radius:9px;background:#c3c4c8;color:#fff;font-size:14px">Confirmar importação</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:16px;font-weight:600">Ordem recomendada</div>
+        <sc-for list="{{ importOrder }}" as="io" hint-placeholder-count="6">
+          <div style="display:flex;gap:12px;align-items:center;font-size:14px"><span style="width:24px;height:24px;border-radius:50%;background:#efeff1;display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:11.5px">{{ io.n }}</span>{{ io.t }}</div>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:16px;font-weight:600">Cópia de segurança</div>
+        <div style="font-size:13px;color:#6b6e74;line-height:1.45">Exporte um backup antes de importar lotes grandes.</div>
+        <div style="display:flex;gap:8px"><button style="height:34px;padding:0 12px;border:1px solid #d6d7da;border-radius:8px;background:#fff;font-size:13.5px;cursor:pointer">Baixar backup</button><button style="height:34px;padding:0 12px;border:1px solid #d6d7da;border-radius:8px;background:#fff;font-size:13.5px;cursor:pointer">Restaurar</button></div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <div style="padding:18px 20px;font-size:16px;font-weight:600">Histórico de importações</div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:680px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left"><th style="padding:10px 20px;font-weight:500">Data</th><th style="padding:10px;font-weight:500">Tipo</th><th style="padding:10px;font-weight:500">Arquivo</th><th style="padding:10px;font-weight:500;text-align:right">Novos</th><th style="padding:10px;font-weight:500;text-align:right">Atualizados</th><th style="padding:10px 20px;font-weight:500;text-align:right">Ignorados</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ importLog }}" as="r" hint-placeholder-count="4">
+          <tr style="border-top:1px solid #efeff1"><td style="padding:12px 20px;font-variant-numeric:tabular-nums;color:#55585d">{{ r.d }}</td><td style="padding:12px 10px">{{ r.k }}</td><td style="padding:12px 10px;font-family:'Geist Mono',monospace;font-size:12.5px">{{ r.f }}</td><td style="padding:12px 10px;text-align:right">{{ r.a }}</td><td style="padding:12px 10px;text-align:right">{{ r.u }}</td><td style="padding:12px 20px;text-align:right">{{ r.s }}</td></tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+</div>
+</sc-if>
+
+<!-- GOVERNANÇA -->
+<sc-if value="{{ is.governanca }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Governança" style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.9px">Administração e governança</h1>
+    <div style="font-size:15px;color:#6b6e74">Perfis de acesso, conferência financeira e histórico de alterações</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+    <sc-for list="{{ roles }}" as="r" hint-placeholder-count="4">
+      <button onClick="{{ r.pick }}" style="text-align:left;border-radius:14px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:6px;border:1px solid {{ r.bd }};background:{{ r.bg }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;width:100%"><b style="font-size:15px">{{ r.name }}</b><span style="font-size:12px;color:#6b6e74">{{ r.users }}</span></div>
+        <span style="font-size:13px;color:#55585d;line-height:1.45">{{ r.desc }}</span>
+      </button>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px">
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+      <div style="padding:18px 20px;font-size:16px;font-weight:600">Matriz de permissões</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px">
+        <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12px;text-align:center"><th style="padding:10px 20px;font-weight:500;text-align:left">Operação</th><th style="padding:10px 6px;font-weight:500">Sócio</th><th style="padding:10px 6px;font-weight:500">Gerente</th><th style="padding:10px 6px;font-weight:500">Admin.</th><th style="padding:10px 6px;font-weight:500">Corretor</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ matrix }}" as="m" hint-placeholder-count="7">
+            <tr style="border-top:1px solid #efeff1;text-align:center"><td style="padding:10px 20px;text-align:left">{{ m.op }}</td>
+              <sc-for list="{{ m.cells }}" as="c" hint-placeholder-count="4"><td style="padding:10px 6px;color:{{ c.fg }};font-weight:600">{{ c.v }}</td></sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;padding-bottom:8px"><div style="font-size:16px;font-weight:600">Fila de conferência financeira</div><span style="white-space:nowrap;font-size:12px;padding:4px 8px;border-radius:6px;background:#f5f0e6;color:#6b5523">{{ pendingCount }} pendentes</span></div>
+      <sc-for list="{{ pending }}" as="p" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #efeff1">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:14px">{{ p.label }}</b><span style="font-size:12.5px;color:#80838a"><span style="font-family:'Geist Mono',monospace">{{ p.id }}</span> · {{ p.by }}</span></div>
+          <b style="font-size:14px;font-variant-numeric:tabular-nums">{{ p.value }}</b>
+          <button onClick="{{ p.reject }}" style="height:32px;padding:0 10px;border:1px solid #d6d7da;border-radius:7px;background:#fff;font-size:13px;cursor:pointer">Ajustar</button>
+          <button onClick="{{ p.approve }}" style="height:32px;padding:0 10px;border:0;border-radius:7px;background:#2c2d30;color:#fff;font-size:13px;cursor:pointer">Aprovar</button>
+        </div>
+      </sc-for>
+      <sc-if value="{{ noPending }}" hint-placeholder-val="{{ false }}"><div style="padding:20px 0;font-size:14px;color:#6b6e74">Nenhum registro aguardando conferência.</div></sc-if>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #e3e3e6;border-radius:14px;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px"><div style="font-size:16px;font-weight:600">Histórico de alterações</div><button style="height:34px;padding:0 12px;border:1px solid #d6d7da;border-radius:8px;background:#fff;font-size:13.5px;cursor:pointer">Exportar CSV</button></div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:700px">
+      <thead><tr style="background:#f7f7f8;color:#55585d;font-size:12.5px;text-align:left"><th style="padding:10px 20px;font-weight:500">Data e hora</th><th style="padding:10px;font-weight:500">Usuário</th><th style="padding:10px;font-weight:500">Ação</th><th style="padding:10px;font-weight:500">Registro</th><th style="padding:10px 20px;font-weight:500">Detalhes</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ audit }}" as="a" hint-placeholder-count="5">
+          <tr style="border-top:1px solid #efeff1"><td style="padding:12px 20px;font-variant-numeric:tabular-nums;color:#55585d;white-space:nowrap">{{ a.at }}</td><td style="padding:12px 10px">{{ a.who }}</td><td style="padding:12px 10px">{{ a.action }}</td><td style="padding:12px 10px;font-family:'Geist Mono',monospace;font-size:12.5px">{{ a.id }}</td><td style="padding:12px 20px;color:#55585d">{{ a.detail }}</td></tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+</div>
+</sc-if>
+
+    </main>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(22,23,25,0.42);z-index:50;display:flex;align-items:center;justify-content:center;padding:24px">
+
+  <sc-if value="{{ m.lead }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.lead }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Novo lead</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Cadastro manual de um contato recebido por telefone, WhatsApp, portal ou indicação.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Cliente *<input name="cliente" type="text" placeholder="Nome completo" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Telefone *<input name="telefone" type="tel" placeholder="(51) 99999-0000" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Origem *<select name="origem" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Instagram/Facebook">Instagram/Facebook</option><option value="Portais">Portais</option><option value="WhatsApp">WhatsApp</option><option value="Indicação">Indicação</option><option value="Site">Site</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Corretor responsável *<select name="corretor" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><sc-for list="{{ corretorOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Imóvel de interesse<select name="imovel" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="">Ainda não definido</option><sc-for list="{{ imovelOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Bairro<input name="bairro" type="text" placeholder="Centro" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Etapa<select name="etapa" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Novo lead">Novo lead</option><option value="Contato inicial">Contato inicial</option><option value="Visita">Visita</option><option value="Proposta">Proposta</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Próximo contato<input name="proximo" type="date" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">Observações<textarea name="obs" rows="3" placeholder="Ex.: procura sala comercial até R$ 3.000, prefere região central." style="border:1px solid #d6d7da;border-radius:9px;padding:10px 12px;background:#fff;font-size:14px;color:#161719;resize:vertical;font-family:inherit"></textarea></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Cadastrar lead</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.interacao }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.interacao }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Registrar interação</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">{{ lead.cliente }} · {{ lead.imovel }} · responsável {{ lead.corretor }}</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Tipo de contato *<select name="tipo" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Ligação">Ligação</option><option value="WhatsApp">WhatsApp</option><option value="Visita">Visita</option><option value="E-mail">E-mail</option><option value="Proposta enviada">Proposta enviada</option><option value="Retorno do cliente">Retorno do cliente</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Data e hora<input name="data" type="datetime-local" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Etapa após o contato<select name="etapa" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Novo lead">Novo lead</option><option value="Contato inicial">Contato inicial</option><option value="Visita">Visita</option><option value="Proposta">Proposta</option><option value="Fechado">Fechado</option><option value="Perdido">Perdido</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Tempo de resposta (min)<input name="tempo" type="number" placeholder="15" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">Descrição<textarea name="descricao" rows="3" placeholder="O que foi conversado e combinado com o cliente." style="border:1px solid #d6d7da;border-radius:9px;padding:10px 12px;background:#fff;font-size:14px;color:#161719;resize:vertical;font-family:inherit"></textarea></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Próximo contato<input name="proximo" type="date" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Próxima ação<input name="acao" type="text" placeholder="Ex.: enviar comparativo" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Salvar interação</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.imovel }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.imovel }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Cadastrar imóvel</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Os dados aparecem na tela Imóveis e ficam disponíveis para vincular leads.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Código<input name="code" type="text" placeholder="IMV-104 (gerado se vazio)" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Nome do imóvel *<input name="name" type="text" placeholder="Apartamento 304" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Tipo *<select name="tipo" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Apartamento">Apartamento</option><option value="Casa">Casa</option><option value="Sobrado">Sobrado</option><option value="Sala Comercial">Sala Comercial</option><option value="Loja">Loja</option><option value="Galpão">Galpão</option><option value="Terreno">Terreno</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Bairro *<input name="bairro" type="text" placeholder="Centro" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Modalidade *<select name="mod" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Venda">Venda</option><option value="Locação">Locação</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Valor (venda ou aluguel mensal) *<input name="valor" type="number" placeholder="285000" required="required" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Proprietário<input name="owner" type="text" placeholder="Nome do proprietário" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Situação<select name="status" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Disponível">Disponível</option><option value="Em negociação">Em negociação</option><option value="Vendido">Vendido</option><option value="Locado">Locado</option></select></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Cadastrar imóvel</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.agenciamento }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.agenciamento }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Novo agenciamento</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Captação de imóvel pelo corretor ou agenciador. Conta para a meta semanal da roleta.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Código do imóvel no portal<input name="code" type="text" placeholder="PORT-0246 (gerado se vazio)" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Data de captação<input name="data" type="date" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Modalidade *<select name="mod" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Venda">Venda</option><option value="Locação">Locação</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Valor anunciado *<input name="valor" type="number" placeholder="319000" required="required" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Imóvel *<input name="imovel" type="text" placeholder="Casa residencial 246" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Bairro *<input name="bairro" type="text" placeholder="Rio Branco" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Corretor *<select name="corretor" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><sc-for list="{{ corretorOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Agenciador<select name="agenciador" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="">Sem agenciador</option><option value="Luiza Ramos">Luiza Ramos</option><option value="Diego Lopes">Diego Lopes</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Situação<select name="status" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Disponível">Disponível</option><option value="Em negociação">Em negociação</option><option value="Vendido">Vendido</option><option value="Locado">Locado</option></select></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Salvar agenciamento</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.caixa }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.caixa }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Nova entrada ou saída</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Lançamento no fluxo de caixa da imobiliária.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Tipo *<select name="tipo" onChange="{{ setCxTipo }}" value="{{ cxTipo }}" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Entrada">Entrada</option><option value="Saída">Saída</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Data *<input name="data" type="date" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">Categoria *<select name="categoria" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><sc-for list="{{ catOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Valor *<input name="valor" type="number" placeholder="13950" required="required" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Situação<select name="status" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Realizado">Realizado</option><option value="Previsto">Previsto</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">Descrição<input name="descricao" type="text" placeholder="Ex.: comissão da venda CTR-101" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">Contrato vinculado<select name="contrato" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="">Nenhum</option><sc-for list="{{ contratoOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      <div style="grid-column:1 / -1;font-size:13px;color:#6a5321;background:#fbf6ea;border:1px solid #eadfc2;border-radius:9px;padding:10px 12px;line-height:1.45">O lançamento entra como pendente e só aparece nos indicadores depois da aprovação de um sócio em Governança.</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Enviar para conferência</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.contrato }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.contrato }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Registrar venda ou locação</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Contrato fechado. O VGV considera apenas vendas; em locações, informe o aluguel mensal.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Tipo *<select name="tipo" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Venda">Venda</option><option value="Locação">Locação</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Data de fechamento *<input name="data" type="date" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Cliente *<input name="cliente" type="text" placeholder="Nome do comprador ou locatário" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Imóvel *<select name="imovel" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><sc-for list="{{ imovelOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Valor do contrato *<input name="valor" type="number" placeholder="285000" required="required" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Comissão<input name="comissao" type="number" placeholder="14250" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Corretor *<select name="corretor" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><sc-for list="{{ corretorOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Origem do cliente<select name="origem" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Instagram/Facebook">Instagram/Facebook</option><option value="Portais">Portais</option><option value="WhatsApp">WhatsApp</option><option value="Indicação">Indicação</option><option value="Site">Site</option></select></label>
+      <div style="grid-column:1 / -1;font-size:13px;color:#6a5321;background:#fbf6ea;border:1px solid #eadfc2;border-radius:9px;padding:10px 12px;line-height:1.45">O contrato entra como pendente e só compõe VGV e ranking depois da aprovação de um sócio.</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Enviar para conferência</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.campanha }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.campanha }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Nova campanha</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Investimento em marketing para acompanhar custo por lead e por fechamento.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">Nome da campanha *<input name="nome" type="text" placeholder="Campanha Apartamento Centro" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Canal *<select name="canal" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Instagram/Facebook">Instagram/Facebook</option><option value="Portais">Portais</option><option value="WhatsApp">WhatsApp</option><option value="Indicação">Indicação</option><option value="Site">Site</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Investimento *<input name="custo" type="number" placeholder="1250" required="required" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Início<input name="inicio" type="date" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Fim<input name="fim" type="date" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Leads gerados<input name="leads" type="number" placeholder="0" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Negócios fechados<input name="fechados" type="number" placeholder="0" min="0" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Cadastrar campanha</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.corretor }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.corretor }}" onClick="{{ stop }}" style="width:100%;max-width:640px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Cadastrar corretor ou agenciador</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Nomes cadastrados aqui passam a ligar leads, agenciamentos e contratos importados.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">Nome completo *<input name="nome" type="text" placeholder="Como aparece nas planilhas" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Função<select name="funcao" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"><option value="Corretor">Corretor</option><option value="Agenciador">Agenciador</option><option value="Gerente de locações">Gerente de locações</option><option value="Administrativo">Administrativo</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">E-mail de acesso<input name="email" type="email" placeholder="nome@imobiliaria.com.br" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">CRECI<input name="creci" type="text" placeholder="Opcional" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0">Telefone<input name="telefone" type="tel" placeholder="(51) 99999-0000" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Cadastrar</button>
+    </div>
+  </form>
+  </sc-if>
+
+  <sc-if value="{{ m.senha }}" hint-placeholder-val="{{ false }}">
+  <form onSubmit="{{ submit.senha }}" onClick="{{ stop }}" style="width:100%;max-width:480px;max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:16px;border:1px solid #e3e3e6;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 0">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:600;letter-spacing:-0.5px">Recuperar acesso</div><div style="font-size:14px;color:#6b6e74;line-height:1.45">Enviaremos um link para redefinir a senha do e-mail cadastrado.</div></div>
+      <button type="button" onClick="{{ closeModal }}" style="width:34px;height:34px;flex:none;border:1px solid #e3e3e6;border-radius:8px;background:#fff;font-size:18px;line-height:1;color:#55585d;cursor:pointer">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 16px;padding:20px 24px">
+      <sc-if value="{{ resetSent }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1 / -1;font-size:14px;color:#4b6446;background:#e9efe7;border-radius:9px;padding:12px 14px;line-height:1.45">Se o e-mail estiver cadastrado, o link chega em alguns minutos. Confira também a caixa de spam.</div></sc-if>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#44474c;min-width:0;grid-column:1 / -1">E-mail *<input name="email" type="email" placeholder="socio@imobiliaria.com.br" required="required" style="height:42px;border:1px solid #d6d7da;border-radius:9px;padding:0 12px;background:#fff;font-size:14px;color:#161719;width:100%"></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid #efeff1;background:#fafafa;border-radius:0 0 16px 16px">
+      <button type="button" onClick="{{ closeModal }}" style="height:40px;padding:0 16px;border:1px solid #d6d7da;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+      <button type="submit" style="height:40px;padding:0 18px;border:0;border-radius:9px;background:#2c2d30;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Enviar link</button>
+    </div>
+  </form>
+  </sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2c2d30;color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;z-index:60;display:flex;gap:10px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#9dbf95"></span>{{ toast }}</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNotice&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Login&quot;,&quot;Dashboard&quot;],&quot;default&quot;:&quot;Dashboard&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    page: localStorage.getItem('imobi_web_page') || (this.props.startScreen === 'Login' ? 'login' : 'dashboard'),
+    leadId: 1, role: 'socio', stage: 'Todas', importKind: 'leads', finMonth: '10', approved: [],
+    modal: null, q: '', period: '1', fCor: '', fOrig: '', fMod: '', cxTipo: 'Entrada', toast: '', loginErr: '', resetSent: false,
+    newLeads: [], newAts: [], stageOv: {}, nextOv: {}, newProps: [], newAgs: [], newCamps: [], newPending: [], newRoster: []
+  };
+  go(p) { localStorage.setItem('imobi_web_page', p); this.setState({ page: p }); window.scrollTo(0, 0); }
+  flash(msg, extra) { this.setState({ ...extra, modal: null, toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2800); }
+  now() { const d = new Date(); return '2026-11-03 ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  money(n) { return 'R$ ' + Math.round(+n || 0).toLocaleString('pt-BR'); }
+  form(e) { e.preventDefault(); return Object.fromEntries(new FormData(e.target)); }
+  componentWillUnmount() { clearTimeout(this._t); }
+
+  renderVals() {
+    const S = this.state;
+    const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+    const mi = n => 'R$ ' + (n / 1e6).toFixed(2).replace('.', ',') + ' mi';
+    const dm = s => s ? s.slice(8, 10) + '/' + s.slice(5, 7) : '—';
+    const dmh = s => dm(s) + ' ' + s.slice(11, 16);
+    const tel = t => { const d = String(t).replace(/\D/g, ''); return d.length >= 10 ? '(' + d.slice(0, 2) + ') ' + d.slice(2, d.length - 4) + '-' + d.slice(-4) : t; };
+    const TODAY = '2026-11-03';
+    const MN = { '05': 'mai', '06': 'jun', '07': 'jul', '08': 'ago', '09': 'set', '10': 'out' };
+    const MFULL = { '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto', '09': 'Setembro', '10': 'Outubro' };
+
+    // ---- dados dos CSVs ----
+    const leadsCsv = [
+      ['Mariana Souza','51999990001','Apartamento 203','Centro','Carlos Lima','Instagram/Facebook','Visita','2026-10-25 09:00','2026-10-28 10:30','Cliente pediu visita','2026-11-02'],
+      ['Pedro Pereira','51999990002','Casa 10','Igara','Juliana Costa','Portais','Contato inicial','2026-10-26 10:00','2026-10-29 13:00','Enviar opções','2026-11-03'],
+      ['Ana Beatriz','51999990003','Sala 5','Centro','Paulo Mendes','Indicação','Novo lead','2026-10-28 11:00','2026-10-28 11:00','Aguardando retorno','2026-11-01'],
+      ['Ricardo Alves','51999990004','Apartamento 203','Centro','Carlos Lima','Instagram/Facebook','Proposta','2026-10-20 08:30','2026-10-30 09:00','Proposta em análise','2026-11-02']
+    ];
+    const atend = [
+      ['ATD-101','Mariana Souza','Apartamento 203','2026-10-28 10:30','Visita','Visita agendada','Carlos Lima','2026-11-02',18],
+      ['ATD-102','Pedro Pereira','Casa 10','2026-10-29 13:00','Contato inicial','Primeiro contato','Juliana Costa','2026-11-03',22],
+      ['ATD-103','Ricardo Alves','Apartamento 203','2026-10-30 09:00','Proposta','Proposta enviada','Carlos Lima','2026-11-02',15]
+    ];
+    const imoveis = [
+      ['IMV-101','Apartamento 203','Centro','Apartamento',285000,'Proprietário Fictício A','Disponível'],
+      ['IMV-102','Casa 10','Igara','Casa',379000,'Proprietário Fictício B','Disponível'],
+      ['IMV-103','Sala 5','Centro','Sala Comercial',2500,'Proprietário Fictício C','Em negociação']
+    ];
+    const campanhasCsv = [['Campanha Apartamento Centro','Instagram/Facebook',35,1250,35.71,2],['Campanha Casa Igara','Portais',21,900,42.86,1]];
+    const agMonths = [['mai',24,15],['jun',27,16],['jul',21,18],['ago',29,15],['set',26,17],['out',23,14]];
+    const agOct = { total: 37, s: 23, l: 14, disp: 24, prev: 43, all: 245 };
+    const agWeeklyRaw = [['Paulo Mendes',3],['Juliana Costa',2],['Bianca Silva',2],['Carlos Lima',0],['Felipe Rocha',0],['Aline Martins',0],['Renato Silva',0],['Marina Duarte',0]];
+    const agRecent = [
+      ['2026-10-27','PORT-0228','Casa residencial 228','Rio Branco','Venda','Juliana Costa','Diego Lopes',399000,'Vendido'],
+      ['2026-10-26','PORT-0211','Apartamento 2 dormitórios 211','Marechal Rondon','Venda','Carlos Lima','—',219000,'Disponível'],
+      ['2026-10-26','PORT-0234','Apartamento para locação 234','Marechal Rondon','Locação','Marina Duarte','—',1250,'Disponível'],
+      ['2026-10-25','PORT-0220','Casa residencial 220','Igara','Venda','Juliana Costa','—',310000,'Disponível'],
+      ['2026-10-25','PORT-0243','Casa para locação 243','Igara','Locação','Felipe Rocha','—',2200,'Disponível'],
+      ['2026-10-24','PORT-0229','Sobrado 229','Centro','Venda','Paulo Mendes','—',219000,'Disponível'],
+      ['2026-10-23','PORT-0212','Casa residencial 212','Nossa Senhora das Graças','Venda','Juliana Costa','Luiza Ramos',245000,'Em negociação'],
+      ['2026-10-23','PORT-0235','Casa para locação 235','Nossa Senhora das Graças','Locação','Felipe Rocha','Luiza Ramos',1600,'Em negociação']
+    ];
+    const agByCor = { 'Juliana Costa': 36, 'Paulo Mendes': 38, 'Bianca Silva': 38, 'Carlos Lima': 38, 'Felipe Rocha': 24, 'Aline Martins': 24, 'Renato Silva': 24, 'Marina Duarte': 23 };
+    const vgvCor = [['Juliana Costa',16,0,2560518,92179],['Bianca Silva',14,0,2379873,85675],['Carlos Lima',14,0,2150160,77406],['Paulo Mendes',13,0,1924449,69280],['Camila Torres',0,14,0,16030],['Rafael Mendes',0,13,0,15691],['Aline Oliveira',0,14,0,15416],['Bruno Ferreira',0,13,0,15364]];
+    const vgvMonth = { '05': [1435000,10,16000,8,59660], '06': [1510000,9,23000,9,65860], '07': [1580000,10,19000,10,66380], '08': [1460000,9,30000,8,67560], '09': [1540000,10,17000,9,63940], '10': [1490000,9,20000,10,63640] };
+    const vgvOrig = [['Instagram/Facebook',32],['Portais',31],['Indicação',24],['WhatsApp',12],['Site',12]];
+    const cxBase = { '05': [51000,29000,16000,8000,16000,7680,4800,3520], '06': [54000,30000,23000,11500,17000,8160,5100,3740], '07': [56000,30500,19000,9500,16750,8040,5025,3685], '08': [59000,31000,30000,15000,17500,8400,5250,3850], '09': [53000,29000,17000,8500,16500,7920,4950,3630], '10': [57000,30000,20000,10000,17500,8400,5250,3850] };
+    const cx = m => { const [com, adm, pri, rep, pes, est, mkt, tec] = cxBase[m]; const ent = com + adm + pri; const sai = com + rep + pes + est + mkt + tec; return { com, dist: com, adm, pri, rep, pes, est, mkt, tec, ent, sai, saldo: ent - sai }; };
+
+    const qq = S.q.trim().toLowerCase(); const match = s => !qq || String(s).toLowerCase().includes(qq);
+    const agAll = [...S.newAgs, ...agRecent]; const camAll = [...campanhasCsv, ...S.newCamps]; const imoveisAll = [...S.newProps, ...imoveis];
+    // ---- leads ----
+    const stageStyle = { 'Novo lead': ['#eef0f3','#3f4650'], 'Contato inicial': ['#efeff1','#44474c'], 'Visita': ['#e8edf3','#3a4a5e'], 'Proposta': ['#f5f0e6','#6b5523'], 'Fechado': ['#e9efe7','#4b6446'], 'Perdido': ['#f6ece9','#8a3f34'] };
+    const atendAll = [...atend, ...S.newAts];
+    const leads = [...leadsCsv, ...S.newLeads].map((r, i) => {
+      const [cliente, t, imovel, bairro, corretor, origem, etapa0, created, updated, obs, next0] = r;
+      const id = i + 1, etapa = S.stageOv[id] || etapa0, next = S.nextOv[id] || next0, st = stageStyle[etapa] || stageStyle['Novo lead'], late = !!next && next < TODAY;
+      const ats = atendAll.filter(a => a[1] === cliente);
+      const prop = imoveisAll.find(p => p[1] === imovel);
+      return { id, cliente, tel: tel(t), imovel, bairro, corretor, origem, etapa, obs, late,
+        ultima: dmh(updated), proximo: dm(next), created: dm(created) + '/2026', sBg: st[0], sFg: st[1],
+        nextFg: late ? '#8a3f34' : '#44474c', status: late ? 'Vencido em ' + dm(next) : dm(next),
+        firstResp: ats.length ? ats[0][8] + ' min' : 'Sem registro',
+        propLine: prop ? prop[0] + ' · ' + (prop[4] < 10000 ? brl(prop[4]) + '/mês' : brl(prop[4])) + ' · ' + prop[6] : 'Imóvel não encontrado no cadastro',
+        ats, createdRaw: created,
+        ini: cliente.split(' ').map(w => w[0]).slice(0, 2).join(''),
+        open: () => { this.setState({ leadId: id }); this.go('lead'); } };
+    });
+    const pages = ['login','dashboard','leads','funil','lead','imoveis','agenciamentos','corretores','marketing','financeiro','importacoes','governanca'];
+    const is = {}; pages.forEach(p => is[p] = S.page === p); is.app = S.page !== 'login';
+    const nav = {}; pages.forEach(p => nav[p] = () => this.go(p));
+    const activeNav = S.page === 'lead' ? 'leads' : S.page;
+    const roleName = { socio: 'Sócio / Gestor', locacoes: 'Gerente de locações', admin: 'Administrativo', corretor: 'Corretor' }[S.role];
+    const roleAllowed = { socio: null, locacoes: ['leads','funil','imoveis','agenciamentos','corretores','governanca'], admin: ['agenciamentos','financeiro','importacoes','governanca'], corretor: ['leads','funil','imoveis','agenciamentos','governanca'] }[S.role];
+
+    const pendingAll = [...S.newPending, ['CTR-101','Venda · Ricardo Alves · Apartamento 203','R$ 285.000','Importado de contratos, 31/10'],['IMP-0042','Fluxo de caixa · out/2026 · 9 lançamentos','R$ 107.000','Importação CSV, 25/10'],['IMP-0043','Contratos com comissão · 111 registros','R$ 9,05 mi','Importação CSV, 21/10']];
+    const pending = pendingAll.filter(p => !S.approved.includes(p[0])).map(([id, label, value, by]) => ({ id, label, value, by,
+      approve: () => this.setState(s => ({ approved: [...s.approved, id] })), reject: () => this.setState(s => ({ approved: [...s.approved, id] })) }));
+
+    const mk = (key, label, count) => ({ key, label, count: count || '', go: () => this.go(key),
+      bg: activeNav === key ? '#2c2d30' : 'transparent', fg: activeNav === key ? '#fff' : '#2e3135', fw: activeNav === key ? 600 : 400 });
+    const navGroups = [
+      { label: 'Comercial', items: [mk('dashboard','Dashboard'), mk('leads','Leads', String(leads.length)), mk('funil','Funil'), mk('imoveis','Imóveis'), mk('agenciamentos','Agenciamentos','245')] },
+      { label: 'Gestão', items: [mk('corretores','Corretores'), mk('marketing','Marketing'), mk('financeiro','Financeiro')] },
+      { label: 'Administração', items: [mk('importacoes','Importações'), mk('governanca','Governança', pending.length ? String(pending.length) : '')] }
+    ].map(g => ({ ...g, items: roleAllowed ? g.items.filter(i => roleAllowed.includes(i.key)) : g.items })).filter(g => g.items.length);
+
+    // ---- dashboard ----
+    const PM = { '1': ['10'], '3': ['08','09','10'], '6': ['05','06','07','08','09','10'] }[S.period];
+    const periodLabel = { '1': 'outubro de 2026', '3': 'agosto a outubro de 2026', '6': 'maio a outubro de 2026' }[S.period];
+    const sumV = k => PM.reduce((acc, m) => acc + vgvMonth[m][k], 0);
+    const agSel = agMonths.filter(x => PM.map(m => MN[m]).includes(x[0]));
+    const agS = agSel.reduce((acc, x) => acc + x[1], 0), agL = agSel.reduce((acc, x) => acc + x[2], 0), agT = agS + agL;
+    const kpis = [
+      { label: 'Captações', value: String(agT), trend: S.period === '1' ? Math.round((agOct.total / agOct.prev - 1) * 100) + '%' : '', sub: agS + ' para venda · ' + agL + ' para locação' },
+      { label: 'Contratos fechados', value: String(sumV(1) + sumV(3)), trend: '', sub: sumV(1) + ' vendas · ' + sumV(3) + ' locações' },
+      { label: 'VGV de vendas', value: mi(sumV(0)), trend: '', sub: periodLabel },
+      { label: 'Comissões', value: brl(sumV(4)), trend: '', sub: 'geradas pelos contratos do período' }
+    ];
+    const order = ['Novo lead','Contato inicial','Visita','Proposta','Fechado'];
+    const fc = ['#c4c5c9','#a9abb0','#8e9095','#74767b','#4f6a4a'];
+    const reached = order.map((s, i) => leads.filter(l => order.indexOf(l.etapa) >= i).length);
+    const funnel = order.map((label, i) => ({ label, n: reached[i], pct: Math.round(reached[i] / leads.length * 100) + '%', color: fc[i] }));
+    const totOrig = vgvOrig.reduce((a, o) => a + o[1], 0);
+    const oc = ['#5b5d62','#808287','#a2a4a8','#c0c1c5','#d9dadd'];
+    const origins = vgvOrig.map(([name, n], i) => ({ name, n, pctS: Math.round(n / totOrig * 100) + '%', pctW: Math.round(n / vgvOrig[0][1] * 100) + '%', color: oc[i] }));
+    const respVals = atend.map(a => a[8]);
+    const responseWeeks = atend.map(a => ({ v: a[8] + ' min', h: Math.round(a[8] / 26 * 100) + '%', d: a[0] }));
+    const agentBars = vgvCor.slice(0, 4).map(a => ({ name: a[0], val: mi(a[3]).replace(' mi', 'mi'), pct: Math.round(a[3] / vgvCor[0][3] * 100) + '%' }));
+    const noReturn = leads.filter(l => l.late).map(l => ({ ...l, dias: 'Vencido ' + l.proximo }));
+
+    // ---- funil / filtros / detalhe ----
+    const leadsBase = leads.filter(l => (!S.fCor || l.corretor === S.fCor) && (!S.fOrig || l.origem === S.fOrig) && match(l.cliente + ' ' + l.imovel + ' ' + l.bairro + ' ' + l.tel));
+    const laneDot = ['#c4c5c9','#a9abb0','#6b7c93','#b08a3e','#5f7a5a'];
+    const lanes = order.map((name, i) => { const cards = leadsBase.filter(l => l.etapa === name); return { name, dot: laneDot[i], cards, total: cards.length, empty: cards.length === 0 }; });
+    const stageFilters = ['Todas', ...order].map(s => { const on = S.stage === s;
+      return { label: s, n: s === 'Todas' ? leadsBase.length : leadsBase.filter(l => l.etapa === s).length, pick: () => this.setState({ stage: s }),
+        bg: on ? '#2c2d30' : '#fff', fg: on ? '#fff' : '#2e3135', bd: on ? '#2c2d30' : '#d6d7da' }; });
+    const leadsFiltered = S.stage === 'Todas' ? leadsBase : leadsBase.filter(l => l.etapa === S.stage);
+    const lead = leads.find(l => l.id === S.leadId) || leads[0];
+    const cur = order.indexOf(lead.etapa);
+    lead.steps = order.map((label, i) => ({ label, bg: i === cur ? '#2c2d30' : i < cur ? '#efeff1' : 'transparent', fg: i === cur ? '#fff' : i < cur ? '#44474c' : '#9a9ca1', fw: i === cur ? 600 : 400 }));
+    const timeline = [
+      ...[...lead.ats].reverse().map(a => ({ title: a[5], when: dmh(a[3]), who: a[6], text: (a[9] ? a[9] + ' · ' : '') + 'Etapa: ' + a[4] + ' · resposta em ' + a[8] + ' min · próximo contato ' + dm(a[7]) + ' (' + a[0] + ')', dot: '#2c2d30' })),
+      { title: 'Lead recebido', when: dmh(lead.createdRaw), who: 'Importação de leads', text: 'Origem ' + lead.origem + '. Observação: ' + lead.obs + '.', dot: '#c4c5c9' }
+    ];
+
+    // ---- imóveis ----
+    const pStatus = { 'Disponível': ['#e9efe7','#4b6446'], 'Em negociação': ['#f5f0e6','#6b5523'], 'Vendido': ['#efeff1','#44474c'], 'Locado': ['#efeff1','#44474c'] };
+    const propertiesAll = [
+      ...imoveisAll.map(([code, name, bairro, tipo, price, owner, status, mod0]) => ({ code, name, bairro, owner, status, mod: mod0 || (price < 10000 ? 'Locação' : 'Venda'), price: (mod0 ? mod0 === 'Locação' : price < 10000) ? brl(price) + '/mês' : brl(price), meta: leads.filter(l => l.imovel === name).length + ' leads' })),
+      ...agAll.filter(a => a[8] === 'Disponível').slice(0, 3).map(a => ({ code: a[1], name: a[2], bairro: a[3], owner: 'Agenciamento · ' + a[5], status: a[8], mod: a[4], price: a[4] === 'Locação' ? brl(a[7]) + '/mês' : brl(a[7]), meta: 'captado ' + dm(a[0]) }))
+    ].map(p => ({ ...p, sBg: pStatus[p.status][0], sFg: pStatus[p.status][1] }));
+    const properties = propertiesAll.filter(p => (!S.fMod || p.mod === S.fMod) && match(p.name + ' ' + p.bairro + ' ' + p.code + ' ' + p.owner));
+
+    // ---- agenciamentos ----
+    const agKpis = [
+      { label: 'Novas captações', value: String(agT), sub: S.period === '1' ? Math.round((agOct.total / agOct.prev - 1) * 100) + '% vs. setembro (' + agOct.prev + ')' : PM.length + ' meses' },
+      { label: 'Captações de venda', value: String(agS), sub: 'novos imóveis no período' },
+      { label: 'Captações de locação', value: String(agL), sub: 'novos imóveis no período' },
+      S.period === '1' ? { label: 'Ainda disponíveis', value: String(agOct.disp), sub: 'das captações do mês' } : { label: 'Média mensal', value: String(Math.round(agT / PM.length)), sub: 'captações por mês' }
+    ];
+    const agHist = agMonths.map(([m, s, l]) => ({ m, s, l, sw: (s / 47 * 100) + '%', lw: (l / 47 * 100) + '%' }));
+    const agWeekly = agWeeklyRaw.map(([name, n]) => ({ name, dots: [0,1,2].map(i => ({ c: i < n ? (n >= 3 ? '#5f7a5a' : '#a9abb0') : '#efeff1' })),
+      label: n >= 3 ? 'Atingiu (' + n + ')' : 'Faltam ' + (3 - n), fg: n >= 3 ? '#4b6446' : '#8a3f34' }));
+    const agRows = agAll.filter(r => match(r.join(' ')) && (!S.fCor || r[5] === S.fCor)).map(([d, code, imovel, bairro, mod, corretor, agenciador, v, status]) => ({ data: dm(d), code, imovel, bairro, mod, corretor, agenciador,
+      valor: mod === 'Locação' ? brl(v) + '/mês' : brl(v), status, sBg: pStatus[status][0], sFg: pStatus[status][1] }));
+
+    // ---- corretores ----
+    const vgvTotal = vgvCor.reduce((a, c) => a + c[3], 0);
+    const names = [...new Set([...Object.keys(agByCor), ...vgvCor.map(c => c[0])])];
+    const agents = names.map(name => { const c = vgvCor.find(x => x[0] === name) || [name, 0, 0, 0, 0];
+      const share = vgvTotal ? c[3] / vgvTotal * 100 : 0;
+      return { name, role: c[1] ? 'Vendas' : c[2] ? 'Locações' : 'Captação', leads: agByCor[name] || 0, visits: c[1], closed: c[2],
+        resp: c[4] ? 'R$ ' + (c[4] / 1000).toFixed(1).replace('.', ',') + ' mil' : '—',
+        ini: name.split(' ').map(w => w[0]).join(''), conv: share.toFixed(1).replace('.', ',') + '%', convW: Math.round(share / 30 * 100) + '%' }; });
+    const vgvRank = vgvCor.map(([name, v, l, vgv, com], i) => ({ pos: String(i + 1).padStart(2, '0'), name, v, l, vgv: vgv ? brl(vgv) : '—', com: brl(com) }));
+    const st = { ok: ['#e9efe7','#4b6446'], ag: ['#eef0f3','#3f4650'], ct: ['#eef0f3','#3f4650'], chk: ['#f5f0e6','#6b5523'] };
+    const roster = [
+      ...names.map(n => { const inAg = !!agByCor[n], inCt = !!vgvCor.find(c => c[0] === n);
+        const k = n === 'Aline Martins' || n === 'Aline Oliveira' ? 'chk' : inAg && inCt ? 'ok' : inAg ? 'ag' : 'ct';
+        return { name: n, role: 'Corretor', files: [inAg ? 'Agenciamentos' : '', inCt ? 'Contratos com comissão' : ''].filter(Boolean).join(', '),
+          status: { ok: 'Vinculado', ag: 'Só em agenciamentos', ct: 'Só em contratos', chk: 'Verificar nome parecido' }[k], sBg: st[k][0], sFg: st[k][1] }; }),
+      { name: 'Luiza Ramos', role: 'Agenciadora', files: 'Agenciamentos (84)', status: 'Prefixo "Agenciador" removido', sBg: '#eef0f3', sFg: '#3f4650' },
+      { name: 'Diego Lopes', role: 'Agenciador', files: 'Agenciamentos (83)', status: 'Prefixo "Agenciador" removido', sBg: '#eef0f3', sFg: '#3f4650' },
+      ...S.newRoster.map(([name, role]) => ({ name, role, files: 'Cadastro manual', status: 'Vinculado', sBg: '#e9efe7', sFg: '#4b6446' }))
+    ];
+
+    // ---- marketing ----
+    const camInv = camAll.reduce((a, c) => a + c[3], 0), camLeads = camAll.reduce((a, c) => a + c[2], 0), camF = camAll.reduce((a, c) => a + c[5], 0);
+    const mktKpis = [
+      { label: 'Investimento', value: brl(camInv), sub: camAll.length + ' campanhas importadas' },
+      { label: 'Custo por lead', value: brl(camInv / camLeads), sub: 'média ponderada' },
+      { label: 'Leads de campanha', value: String(camLeads), sub: 'informados no CSV' },
+      { label: 'Custo por fechamento', value: brl(camInv / camF), sub: camF + ' negócios' }
+    ];
+    const campaigns = camAll.map(([nome, canal, leads, custo, cpl, fechados]) => ({ nome, canal, leads, custo: brl(custo), cpl: 'R$ ' + cpl.toFixed(2).replace('.', ','), fechados }));
+
+    // ---- financeiro ----
+    const fm = S.finMonth, c = cx(fm), v = vgvMonth[fm];
+    const finKpis = [
+      { label: 'Entradas realizadas', value: brl(c.ent), sub: 'comissões + locações' },
+      { label: 'Saídas realizadas', value: brl(c.sai), sub: 'distribuição, repasses e despesas' },
+      { label: 'Saldo de caixa', value: brl(c.saldo), sub: 'entradas menos saídas' },
+      { label: 'VGV de vendas', value: mi(v[0]), sub: v[1] + ' vendas fechadas' }
+    ];
+    const finAreas = [
+      { title: 'Vendas', rows: [
+        { label: 'VGV de vendas', note: v[1] + ' contratos de venda', value: brl(v[0]) },
+        { label: 'Comissões recebidas', note: 'entrada de caixa', value: brl(c.com) },
+        { label: 'Distribuição aos sócios', note: 'saída de caixa', value: brl(c.dist) } ] },
+      { title: 'Locações', rows: [
+        { label: 'Novos aluguéis contratados', note: v[3] + ' locações · não soma ao VGV', value: brl(v[2]) },
+        { label: 'Administração recorrente', note: 'entrada de caixa', value: brl(c.adm) },
+        { label: 'Primeiros aluguéis', note: 'entrada de caixa', value: brl(c.pri) },
+        { label: 'Repasse da intermediação', note: 'saída de caixa', value: brl(c.rep) } ] },
+      { title: 'Despesas', rows: [
+        { label: 'Pessoal', note: 'saída de caixa', value: brl(c.pes) },
+        { label: 'Estrutura', note: 'saída de caixa', value: brl(c.est) },
+        { label: 'Marketing', note: 'saída de caixa', value: brl(c.mkt) },
+        { label: 'Tecnologia e outras', note: 'saída de caixa', value: brl(c.tec) } ] }
+    ];
+    const finMonths = ['05','06','07','08','09','10'].map(m => { const x = cx(m), y = vgvMonth[m];
+      return { m: m + '/2026', vgv: brl(y[0]), alug: brl(y[2]), ent: brl(x.ent), sai: brl(x.sai), saldo: brl(x.saldo) }; });
+
+    // ---- importações ----
+    const O = 'Obrigatório', P = 'Opcional', A = 'Calculado se vazio';
+    const kindDefs = [
+      { k: 'leads', title: 'Leads', sub: 'campanhas, portais, WhatsApp', file: 'modelo_leads.csv', rows: 4,
+        cols: [['cliente','Cliente','Mariana Souza',O],['telefone','Telefone','51999990001',O],['imovel','Imóvel de interesse (nome)','Apartamento 203',P],['bairro','Bairro','Centro',P],['corretor','Corretor responsável','Carlos Lima',O],['origem','Origem','Instagram/Facebook',O],['stage','Etapa do funil','Visita',O],['createdAt','Data de entrada','2026-10-25 09:00',O],['updatedAt','Última interação','2026-10-28 10:30',P],['observations','Observações / próxima ação','Cliente pediu visita',P],['nextActionDate','Próximo contato','2026-11-02',P]],
+        warn: ['O arquivo não tem coluna de código do lead. Na reimportação, o sistema usa o telefone para identificar o mesmo lead.','O imóvel é informado pelo nome ("Apartamento 203"), não pelo código IMV.'], dedupe: 'Leads com o mesmo telefone são atualizados, não duplicados.' },
+      { k: 'activities', title: 'Atendimentos', sub: 'contatos, visitas, propostas', file: 'modelo_atendimentos.csv', rows: 3,
+        cols: [['activityId','Código do atendimento','ATD-101',O],['leadId','Lead vinculado','(vazio)',P],['cliente','Cliente','Mariana Souza',O],['imovel','Imóvel','Apartamento 203',P],['data','Data e hora','2026-10-28 10:30',O],['etapa','Etapa após o contato','Visita',O],['descricao','Descrição','Visita agendada',P],['corretor','Corretor','Carlos Lima',O],['proximoContato','Próximo contato','2026-11-02',P],['tempoRespostaMin','Tempo de resposta (min)','18',P]],
+        warn: ['A coluna leadId está vazia nos 3 registros. O vínculo com o lead será feito pelo nome do cliente.'], dedupe: 'Atendimentos com o mesmo activityId são atualizados, não duplicados.' },
+      { k: 'properties', title: 'Imóveis', sub: 'cadastro do CRM', file: 'modelo_imoveis.csv', rows: 3,
+        cols: [['code','Código','IMV-101',O],['name','Nome do imóvel','Apartamento 203',O],['bairro','Bairro','Centro',O],['tipo','Tipo','Apartamento',O],['price','Valor (venda ou aluguel mensal)','285000',O],['owner','Proprietário','Proprietário Fictício A',P],['status','Situação','Disponível',O]],
+        warn: ['Os códigos IMV deste arquivo são diferentes dos códigos PORT dos agenciamentos. Um mesmo imóvel pode aparecer duas vezes.'], dedupe: 'Imóveis com o mesmo código são atualizados, não duplicados.' },
+      { k: 'agenciamentos', title: 'Agenciamentos', sub: 'exportação semanal do portal', file: 'modelo_importacao_agenciamentos.csv', rows: 245,
+        cols: [['agenciamentoId','Código do agenciamento','AG-0001',O],['codigoImovel','Código do imóvel','PORT-0001',O],['dataCadastro','Data de captação','2026-05-17',O],['modalidade','Modalidade','Venda',O],['corretor','Corretor','Juliana Costa',O],['agenciador','Agenciador','Luiza Ramos',P],['imovel','Imóvel','Casa residencial 001',O],['bairro','Bairro','São José',O],['valorAnuncio','Valor anunciado','399000',O],['status','Situação','Disponível',O],['origem','Origem','Portal imobiliário',P],['observacoes','Observações','—',P]],
+        warn: ['O prefixo "Agenciador " é removido do nome (167 registros).','A origem "Portal imobiliário" é padronizada como "Portais".','78 registros não têm agenciador.'], dedupe: 'Agenciamentos com o mesmo agenciamentoId são atualizados, não duplicados.' },
+      { k: 'deals', title: 'Contratos', sub: 'vendas e locações sem comissão', file: 'modelo_contratos.csv', rows: 1,
+        cols: [['contractId','Código do contrato','CTR-101',O],['leadId','Lead vinculado','(vazio)',P],['cliente','Cliente','Ricardo Alves',O],['imovel','Imóvel','Apartamento 203',O],['tipo','Tipo','Venda',O],['valor','Valor do contrato','285000',O],['dataFechamento','Data de fechamento','2026-10-31',O],['corretor','Corretor','Carlos Lima',O],['origem','Origem','Instagram/Facebook',P]],
+        warn: ['Este arquivo tem as mesmas colunas de "Contratos com comissão", sem a comissão. Sugestão: usar só o modelo com comissão.'], dedupe: 'Contratos com o mesmo contractId são atualizados e entram na fila de conferência.' },
+      { k: 'vgv', title: 'Contratos com comissão', sub: 'VGV e comissões', file: 'modelo_vgv_contratos.csv', rows: 111,
+        cols: [['contractId','Código do contrato','VEN-0001',O],['leadId','Lead vinculado','(vazio)',P],['cliente','Cliente','Comprador Simulado 001',O],['imovel','Imóvel','Apartamento Centro',O],['tipo','Tipo','Venda / Locação',O],['valor','Valor (venda ou aluguel mensal)','98184',O],['dataFechamento','Data de fechamento','2026-05-02',O],['corretor','Corretor','Carlos Lima',O],['origem','Origem','Instagram/Facebook',P],['comissao','Comissão','3534.62',O]],
+        warn: ['4 corretores deste arquivo (Aline Oliveira, Rafael Mendes, Camila Torres e Bruno Ferreira) não aparecem nos agenciamentos.','Em locações, o valor é o aluguel mensal e não entra no VGV.'], dedupe: 'Contratos com o mesmo contractId são atualizados e entram na fila de conferência.' },
+      { k: 'cash', title: 'Fluxo de caixa', sub: 'entradas e saídas', file: 'modelo_fluxo_caixa.csv', rows: 54,
+        cols: [['entryId','Código do lançamento','CX-0001',O],['data','Data','2026-05-04',O],['tipo','Entrada ou Saída','Entrada',O],['categoria','Categoria','Vendas - comissões recebidas',O],['descricao','Descrição','Comissões de vendas recebidas',P],['valor','Valor','51000',O],['status','Situação','Realizado',O],['contractId','Contrato vinculado','(vazio)',P]],
+        warn: ['Nenhum lançamento tem contrato vinculado. As comissões entram como valor mensal consolidado.','Categorias aceitas: 3 de entrada (comissões, administração, primeiro aluguel) e 6 de saída (distribuição, repasse, pessoal, estrutura, marketing, tecnologia).'], dedupe: 'Lançamentos com o mesmo entryId são atualizados e entram na fila de conferência.' },
+      { k: 'campaigns', title: 'Campanhas', sub: 'marketing', file: 'modelo_campanhas.csv', rows: 2,
+        cols: [['nome','Nome da campanha','Campanha Casa Igara',O],['canal','Canal','Portais',O],['leads','Leads gerados','21',O],['custo','Investimento','900',O],['cpl','Custo por lead','42.86',A],['fechados','Negócios fechados','1',O]],
+        warn: ['O arquivo não tem período (início e fim), então as campanhas não acompanham o filtro de datas.'], dedupe: 'Campanhas com o mesmo nome são atualizadas, não duplicadas.' }
+    ];
+    const kd = kindDefs.find(x => x.k === S.importKind) || kindDefs[0];
+    const kind = { title: kd.title, file: kd.file, dedupe: kd.dedupe, hasWarn: kd.warn.length > 0, warn: kd.warn.map(t => ({ t })),
+      cols: kd.cols.map(([col, field, ex, req]) => ({ col, field, ex, req, reqFg: req === O ? '#2e3135' : '#80838a' })) };
+    const importKinds = kindDefs.map(x => ({ title: x.title, sub: x.sub, pick: () => this.setState({ importKind: x.k }),
+      bd: S.importKind === x.k ? '#2c2d30' : '#e3e3e6', bg: S.importKind === x.k ? '#f4f4f5' : '#fff' }));
+    const importOrder = ['Imóveis','Agenciamentos','Leads','Atendimentos','Contratos com comissão','Fluxo de caixa','Campanhas'].map((t, i) => ({ n: i + 1, t }));
+    const importLog = [['03/11 10:12','Agenciamentos','exemplo_agenciamentos_6_meses.csv',245,0,0],['03/11 10:10','Contratos com comissão','exemplo_preenchido_vgv_contratos.csv',111,0,0],['03/11 10:08','Fluxo de caixa','exemplo_preenchido_fluxo_caixa.csv',54,0,0],['03/11 10:06','Leads','exemplo_preenchido_leads.csv',4,0,0],['03/11 10:05','Atendimentos','exemplo_preenchido_atendimentos.csv',3,0,0],['03/11 10:04','Imóveis','exemplo_preenchido_imoveis.csv',3,0,0],['03/11 10:03','Contratos','exemplo_preenchido_contratos.csv',1,0,0],['03/11 10:02','Campanhas','exemplo_preenchido_campanhas.csv',2,0,0]]
+      .map(([d, k, f, a, u, s]) => ({ d, k, f, a, u, s }));
+
+    // ---- governança ----
+    const roleDefs = [['socio','Sócio / Gestor','2 usuários','Indicadores consolidados e aprovação dos registros financeiros.'],['locacoes','Gerente de locações','1 usuário','Operação comercial; valores financeiros globais restritos.'],['admin','Administrativo','1 usuário','Registra e importa contratos e caixa, sem ver o consolidado.'],['corretor','Corretor','12 usuários','Registra atendimentos e vê a própria carteira.']];
+    const roles = roleDefs.map(([k, name, users, desc]) => ({ name, users, desc, pick: () => this.setState({ role: k }), bd: S.role === k ? '#2c2d30' : '#e3e3e6', bg: S.role === k ? '#f7f7f8' : '#fff' }));
+    const Y = { v: '✓', fg: '#4b6446' }, N = { v: '—', fg: '#b4b6ba' };
+    const matrix = [['Registrar leads e atendimentos',[Y,Y,N,Y]],['Importar contratos e caixa',[Y,N,Y,N]],['Ver VGV e caixa consolidados',[Y,N,N,N]],['Cadastrar agenciamentos',[Y,Y,Y,Y]],['Ver indicadores de locação',[Y,Y,N,N]],['Aprovar dados financeiros',[Y,N,N,N]],['Configurar perfis',[Y,N,N,N]]].map(([op, cells]) => ({ op, cells }));
+    const audit = [['03/11 10:12','Administrativo','Importação CSV','agenciamentos','245 incluídos'],['03/11 10:10','Administrativo','Importação CSV','vgv_contratos','111 incluídos, pendente de conferência'],['03/11 10:08','Administrativo','Importação CSV','fluxo_caixa','54 incluídos, pendente de conferência'],['03/11 10:06','Gerente de locações','Importação CSV','leads','4 incluídos'],['30/10 09:00','Corretor','Atualização de lead','Ricardo Alves','Etapa alterada para Proposta']]
+      .map(([at, who, action, id, detail]) => ({ at, who, action, id, detail }));
+
+    return {
+      is, nav, roleName, role: S.role, navGroups, showNotice: this.props.showNotice ?? true,
+      setRole: e => this.setState({ role: e.target.value }),
+      kpis, funnel, funnelNote: reached[3] + ' de ' + leads.length + ' leads chegaram à proposta. Nenhum fechamento registrado no arquivo de leads.',
+      origins, responseWeeks, respAvg: String(Math.round(respVals.reduce((a, b) => a + b, 0) / respVals.length)), respBadge: atend.length + ' atendimentos',
+      recentLeads: leads, agentBars, noReturn, lateCount: noReturn.length + ' leads',
+      stageFilters, leadsFiltered, leadsCount: leadsFiltered.length, leadsTotal: leads.length,
+      leadsSub: leads.length + ' registros importados · ' + noReturn.length + ' com próximo contato vencido',
+      lanes, lead, timeline, properties, propSub: imoveis.length + ' imóveis cadastrados + captações recentes disponíveis',
+      agKpis, agHist, agWeekly, agRows, agents, vgvRank, roster, mktKpis, campaigns,
+      finKpis, finAreas, finMonths, finMonth: fm, finSub: MFULL[fm] + ' 2026', setFinMonth: e => this.setState({ finMonth: e.target.value }),
+      importKinds, importOrder, importLog, kind,
+      period: S.period, periodLabel, setPeriod: e => this.setState({ period: e.target.value }),
+      q: S.q, setQ: e => { const v = e.target.value; this.setState({ q: v }); if (v && !['leads','funil','imoveis','agenciamentos'].includes(S.page)) this.go('leads'); },
+      fCor: S.fCor, fOrig: S.fOrig, fMod: S.fMod,
+      setFCor: e => this.setState({ fCor: e.target.value }), setFOrig: e => this.setState({ fOrig: e.target.value }), setFMod: e => this.setState({ fMod: e.target.value }),
+      hasFilters: !!(S.fCor || S.fOrig || S.q || S.stage !== 'Todas'), clearFilters: () => this.setState({ fCor: '', fOrig: '', q: '', stage: 'Todas' }),
+      leadsEmpty: leadsFiltered.length === 0, propsEmpty: properties.length === 0,
+      corretorOpts: [...names, ...S.newRoster.filter(r => r[1] === 'Corretor').map(r => r[0])].map(v => ({ v })),
+      origemOpts: ['Instagram/Facebook','Portais','WhatsApp','Indicação','Site'].map(v => ({ v })),
+      imovelOpts: imoveisAll.map(p => ({ v: p[1] })),
+      contratoOpts: ['CTR-101', ...S.newPending.filter(p => p[0].startsWith('CTR')).map(p => p[0])].map(v => ({ v })),
+      cxTipo: S.cxTipo, setCxTipo: e => this.setState({ cxTipo: e.target.value }),
+      catOpts: (S.cxTipo === 'Entrada' ? ['Vendas - comissões recebidas','Locações - administração recorrente','Locações - primeiro aluguel','Outras entradas'] : ['Vendas - distribuição aos sócios','Locações - repasse da intermediação','Despesas - pessoal','Despesas - estrutura','Despesas - marketing','Despesas - tecnologia e outras']).map(v => ({ v })),
+      modalOpen: !!S.modal, m: Object.fromEntries(['lead','interacao','imovel','agenciamento','caixa','contrato','campanha','corretor','senha'].map(k => [k, S.modal === k])),
+      openM: Object.fromEntries(['lead','interacao','imovel','agenciamento','caixa','contrato','campanha','corretor','senha'].map(k => [k, () => this.setState({ modal: k, resetSent: false })])),
+      closeModal: () => this.setState({ modal: null }), stop: e => e.stopPropagation(),
+      hasToast: !!S.toast, toast: S.toast, resetSent: S.resetSent,
+      hasLoginErr: !!S.loginErr, loginErr: S.loginErr,
+      doLogin: () => { const em = (document.querySelector('input[name="loginEmail"]') || {}).value || '', pw = (document.querySelector('input[name="loginPass"]') || {}).value || '';
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return this.setState({ loginErr: 'Informe um e-mail válido.' });
+        if (pw.length < 6) return this.setState({ loginErr: 'A senha precisa ter pelo menos 6 caracteres.' });
+        this.setState({ loginErr: '' }); this.go('dashboard'); },
+      submit: {
+        lead: e => { const d = this.form(e), n = this.now(); this.flash('Lead ' + d.cliente + ' cadastrado', { stage: 'Todas', fCor: '', fOrig: '', q: '', newLeads: [...S.newLeads, [d.cliente, d.telefone, d.imovel || '—', d.bairro || '—', d.corretor, d.origem, d.etapa, n, n, d.obs || 'Sem observações', d.proximo || '']] }); },
+        interacao: e => { const d = this.form(e), id = lead.id, dt = d.data ? d.data.replace('T', ' ') : this.now();
+          this.flash('Interação registrada para ' + lead.cliente, { newAts: [...S.newAts, ['ATD-' + (104 + S.newAts.length), lead.cliente, lead.imovel, dt, d.etapa, d.tipo, lead.corretor, d.proximo || '', +d.tempo || 0, [d.descricao, d.acao && 'próxima ação: ' + d.acao].filter(Boolean).join(' · ')]],
+            stageOv: { ...S.stageOv, [id]: d.etapa }, nextOv: d.proximo ? { ...S.nextOv, [id]: d.proximo } : S.nextOv }); },
+        imovel: e => { const d = this.form(e); this.flash('Imóvel ' + d.name + ' cadastrado', { fMod: '', q: '', newProps: [[d.code || 'IMV-' + (104 + S.newProps.length), d.name, d.bairro, d.tipo, +d.valor || 0, d.owner || '—', d.status, d.mod], ...S.newProps] }); },
+        agenciamento: e => { const d = this.form(e); this.flash('Agenciamento salvo', { q: '', newAgs: [[d.data || '2026-11-03', d.code || 'PORT-' + String(246 + S.newAgs.length).padStart(4, '0'), d.imovel, d.bairro, d.mod, d.corretor, d.agenciador || '—', +d.valor || 0, d.status], ...S.newAgs] }); },
+        caixa: e => { const d = this.form(e); this.flash('Lançamento enviado para conferência', { newPending: [['CX-' + (2300 + S.newPending.length), d.tipo + ' · ' + d.categoria + (d.descricao ? ' · ' + d.descricao : ''), this.money(d.valor), 'Cadastro manual, ' + dm(d.data)], ...S.newPending] }); },
+        contrato: e => { const d = this.form(e); this.flash('Contrato enviado para conferência', { newPending: [['CTR-' + (102 + S.newPending.length), d.tipo + ' · ' + d.cliente + ' · ' + d.imovel, this.money(d.valor), 'Cadastro manual, ' + dm(d.data)], ...S.newPending] }); },
+        campanha: e => { const d = this.form(e), l = +d.leads || 0, c = +d.custo || 0; this.flash('Campanha cadastrada', { newCamps: [...S.newCamps, [d.nome, d.canal, l, c, l ? c / l : 0, +d.fechados || 0]] }); },
+        corretor: e => { const d = this.form(e); this.flash(d.nome + ' cadastrado', { newRoster: [...S.newRoster, [d.nome, d.funcao]] }); },
+        senha: e => { e.preventDefault(); this.setState({ resetSent: true }); }
+      },
+      roles, matrix, pending, pendingCount: pending.length, noPending: pending.length === 0, audit
+    };
+  }
+}
+</script>
+</body>
+</html>

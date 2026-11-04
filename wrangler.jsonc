@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Publicado em https://crm.imobiinsight.workers.dev (plano Free, sem cartão)
+  "name": "crm",
+  "account_id": "d3140ad74f62a6fc2bd1dbd246f41c4e",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "crm"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+  // Segredos (não ficam aqui): DATABASE_URL, AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, SYNC_SECRET
+  // Local: .dev.vars   ·   Produção: npx wrangler secret put <NOME>
+}
