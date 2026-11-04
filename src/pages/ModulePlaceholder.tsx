@@ -1,6 +1,8 @@
-import { notFound } from "next/navigation";
+import { useParams } from "react-router";
 import { EmptyState, PageHeader } from "@/components/ui/Card";
 import { MODULES, type ModuleKey } from "@/lib/nav";
+import { usePageTitle } from "@/lib/usePageTitle";
+import { NotFoundContent } from "./NotFound";
 
 const PHASE: Partial<Record<ModuleKey, string>> = {
   leads: "fase 3",
@@ -15,10 +17,12 @@ const PHASE: Partial<Record<ModuleKey, string>> = {
 };
 
 // Telas ainda não construídas — cada uma ganha sua própria rota na fase indicada.
-export default async function ModulePlaceholder({ params }: { params: Promise<{ modulo: string }> }) {
-  const { modulo } = await params;
+export function ModulePlaceholder() {
+  const { modulo = "" } = useParams();
   const key = modulo as ModuleKey;
-  if (!(key in MODULES) || key === "dashboard") notFound();
+  const known = key in MODULES && key !== "dashboard";
+  usePageTitle(known ? MODULES[key].label : "Página não encontrada");
+  if (!known) return <NotFoundContent />;
   return (
     <>
       <PageHeader title={MODULES[key].label} />

@@ -1,12 +1,9 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "react-router";
 import { Avatar } from "@/components/ui/Misc";
 import { moduleFromPath, navFor, ROLE_NAME, type Role } from "@/lib/nav";
 
 export function Sidebar({ role, userName, counts = {} }: { role: Role; userName: string; counts?: Record<string, string> }) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const active = moduleFromPath(pathname);
   const groups = navFor(role);
 
@@ -22,7 +19,7 @@ export function Sidebar({ role, userName, counts = {} }: { role: Role; userName:
               return (
                 <Link
                   key={it.key}
-                  href={it.href}
+                  to={it.href}
                   aria-current={on ? "page" : undefined}
                   className={`flex items-center justify-between rounded-[8px] px-[10px] py-[9px] text-[14.5px] no-underline ${
                     on ? "bg-primary font-semibold text-white hover:text-white" : "text-ink-2 hover:bg-[#e2e2e5]"
@@ -42,7 +39,7 @@ export function Sidebar({ role, userName, counts = {} }: { role: Role; userName:
           <span className="truncate text-[14px] font-semibold">{userName}</span>
           <span className="text-[12px] text-muted-2">{ROLE_NAME[role]}</span>
         </div>
-        <Link href="/login" className="text-[12px] text-muted no-underline">
+        <Link to="/login" className="text-[12px] text-muted no-underline">
           Sair
         </Link>
       </div>

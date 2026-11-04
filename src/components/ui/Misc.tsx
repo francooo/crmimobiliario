@@ -1,13 +1,13 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 import { initials } from "@/lib/format";
 
 /** Chip de filtro — 34px, raio 8; ativo = fundo primário */
-export function Chip({ href, active, children }: { href: string; active?: boolean; children: ReactNode }) {
+export function Chip({ to, active, children }: { to: string; active?: boolean; children: ReactNode }) {
   return (
     <Link
-      href={href}
-      scroll={false}
+      to={to}
+      preventScrollReset
       className={`inline-flex h-[34px] items-center rounded-[8px] px-3 text-[14px] no-underline ${
         active ? "bg-primary text-white hover:text-white" : "border border-border-strong bg-surface text-ink-2"
       }`}

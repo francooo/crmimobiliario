@@ -1,9 +1,10 @@
-import Link from "next/link";
+import { Link } from "react-router";
+import { usePageTitle } from "@/lib/usePageTitle";
 
-export const metadata = { title: "Entrar" };
 
 // Login em duas colunas (painel escuro da marca + formulário). O botão Google é ligado na fase 1.
-export default function LoginPage() {
+export function LoginPage() {
+  usePageTitle("Entrar");
   return (
     <div className="grid min-h-screen grid-cols-1 bg-bg md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <div className="flex flex-col justify-between gap-10 bg-primary px-14 py-12 text-bg">
@@ -35,8 +36,8 @@ export default function LoginPage() {
             corretor) define quais módulos aparecem após o login.
           </div>
           <div className="flex gap-4 text-[13px]">
-            <Link href="/privacidade">Privacidade</Link>
-            <Link href="/termos">Termos de uso</Link>
+            <Link to="/privacidade">Privacidade</Link>
+            <Link to="/termos">Termos de uso</Link>
           </div>
         </div>
       </div>

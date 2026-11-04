@@ -2,8 +2,8 @@
 
 /* Tokens do design system ImobiInsight (docs/pacote/design-system/tokens.json) */
 @theme {
-  --font-sans: var(--font-geist), -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: Geist, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
 
   --color-bg: #f4f4f5;
   --color-surface: #ffffff;
@@ -51,38 +51,38 @@
   --radius-modal: 16px;
 }
 
-* {
-  box-sizing: border-box;
+/* Estilos base dentro da camada "base": assim as classes utilitárias (ex.: text-white
+   no item ativo do menu) sempre têm prioridade sobre estas regras globais. */
+@layer base {
+  html,
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: #3d4045;
+  }
+  a:hover {
+    color: var(--color-ink);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
 }
 
-html,
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-}
-
-a {
-  color: #3d4045;
-}
-a:hover {
-  color: var(--color-ink);
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-.tabular {
+@utility tabular {
   font-variant-numeric: tabular-nums;
 }
 
 /* Espaço reservado de foto: listras diagonais */
-.photo-placeholder {
+@utility photo-placeholder {
   background: repeating-linear-gradient(135deg, #f1f1f3 0 10px, #e8e8eb 10px 20px);
 }

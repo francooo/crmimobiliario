@@ -3,11 +3,12 @@ import { Card, KpiCard, Notice, PageHeader } from "@/components/ui/Card";
 import { BarH } from "@/components/ui/Misc";
 import { money, moneyShort } from "@/lib/format";
 
-export const metadata = { title: "Dashboard" };
+import { usePageTitle } from "@/lib/usePageTitle";
 
 // Fase 0: tela de demonstração do design system. Os números são os de referência
 // dos CSVs de exemplo (docs/ANALISE-PLANILHAS.md); na fase 3 vêm do Neon.
-export default function DashboardPage() {
+export function DashboardPage() {
+  usePageTitle("Dashboard");
   const origens = [
     { label: "Instagram/Facebook", v: 32 },
     { label: "Portais", v: 31 },

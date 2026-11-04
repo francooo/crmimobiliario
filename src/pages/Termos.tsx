@@ -1,8 +1,9 @@
-import Link from "next/link";
+import { Link } from "react-router";
+import { usePageTitle } from "@/lib/usePageTitle";
 
-export const metadata = { title: "Termos de Uso" };
 
-export default function TermosPage() {
+export function TermosPage() {
+  usePageTitle("Termos de Uso");
   return (
     <>
       <h1>Termos de Uso</h1>
@@ -29,7 +30,7 @@ export default function TermosPage() {
       <h2>3. Dados</h2>
       <p>
         As informações exibidas vêm das planilhas mantidas pela imobiliária. A exatidão dos dados depende do preenchimento dessas
-        planilhas. O tratamento de dados pessoais segue a <Link href="/privacidade">Política de Privacidade</Link>.
+        planilhas. O tratamento de dados pessoais segue a <Link to="/privacidade">Política de Privacidade</Link>.
       </p>
 
       <h2>4. Disponibilidade</h2>

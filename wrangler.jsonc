@@ -3,21 +3,19 @@
   // Publicado em https://crm.imobiinsight.workers.dev (plano Free, sem cartão)
   "name": "crm",
   "account_id": "d3140ad74f62a6fc2bd1dbd246f41c4e",
-  "main": ".open-next/worker.js",
+  "main": "./worker/index.ts",
   "compatibility_date": "2026-10-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": false,
+  "upload_source_maps": true,
   "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    // Telas (React) são arquivos estáticos: servidos sem acionar o Worker (sem custo de CPU).
+    // Rotas desconhecidas devolvem index.html para o React Router.
+    "not_found_handling": "single-page-application",
+    // Só /api/* executa o Worker.
+    "run_worker_first": ["/api/*"]
   },
-  "services": [
-    {
-      "binding": "WORKER_SELF_REFERENCE",
-      "service": "crm"
-    }
-  ],
   "observability": {
     "enabled": true
   }

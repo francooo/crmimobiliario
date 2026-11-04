@@ -1,7 +1,5 @@
-"use client";
-
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 
 export const PERIODS = [
   { value: "1", label: "Mês atual" },
@@ -11,9 +9,9 @@ export const PERIODS = [
 
 /** Cabeçalho fixo de 68px: busca global (⌘K / Ctrl+K) e seletor de período */
 export function Header() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const params = useSearchParams();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [params] = useSearchParams();
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -36,13 +34,13 @@ export function Header() {
     const next = new URLSearchParams(pathname === searchTarget ? params : undefined);
     if (q) next.set("q", q);
     else next.delete("q");
-    router.push(`${searchTarget}${next.size ? `?${next}` : ""}`);
+    navigate(`${searchTarget}${next.size ? `?${next}` : ""}`);
   }
 
   function onPeriod(value: string) {
     const next = new URLSearchParams(params);
     next.set("periodo", value);
-    router.push(`${pathname}?${next}`);
+    navigate(`${pathname}?${next}`);
   }
 
   return (
@@ -55,6 +53,7 @@ export function Header() {
         <input
           ref={searchRef}
           name="q"
+          key={params.get("q") ?? ""}
           defaultValue={params.get("q") ?? ""}
           placeholder="Buscar cliente, imóvel, bairro ou código"
           aria-label="Busca global"

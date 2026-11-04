@@ -1,6 +1,7 @@
-export const metadata = { title: "Política de Privacidade" };
+import { usePageTitle } from "@/lib/usePageTitle";
 
-export default function PrivacidadePage() {
+export function PrivacidadePage() {
+  usePageTitle("Política de Privacidade");
   return (
     <>
       <h1>Política de Privacidade</h1>

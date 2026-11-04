@@ -6,7 +6,8 @@ O repositório só tem `CRM web system design.zip` (pacote "pacote-imobiinsight"
 - **Google Sheets = fonte única dos dados de negócio** (uma planilha separada por tipo, mesmas colunas dos modelos CSV).
 - **Apps Script** (grátis) lê as planilhas e envia os dados ao sistema a cada 10 min.
 - **Neon (Postgres, plano Free, região São Paulo)** = espelho dos dados das planilhas para consultas/KPIs + dados próprios do sistema (usuários, logs) + **fotos dos imóveis** (tabela `imovel_fotos`, coluna `bytea`).
-- **Cloudflare Workers (plano Free, sem cartão)** = frontend + backend (Next.js via OpenNext). R2 descartado para não exigir cartão.
+- **Cloudflare Workers (plano Free, sem cartão)** = telas React servidas como arquivos estáticos (não acionam o Worker) + API Hono em `/api/*`. R2 descartado para não exigir cartão.
+- **Mudança de 2026-11-04:** a fase 0 começou com Next.js (SSR via OpenNext), mas a medição em produção mostrou 16–144 ms de CPU por tela contra o limite de 10 ms do plano grátis. Trocado por SPA (Vite + React) + API enxuta; `/api/health` mede 5–13 ms mesmo dentro do Next.js. A versão Next.js ficou no commit `e13231c` do branch `fase-0`.
 - **Login com Google**, liberado só para e-mails cadastrados na planilha de Corretores.
 - Dados do Sheets entram **direto** (sem fila de aprovação).
 
@@ -16,20 +17,21 @@ Referências dentro do zip (extrair para `docs/pacote/` na fase 0): `REGRAS-DE-N
 | Serviço | Limite grátis (confirmado em nov/2026) | Uso previsto | Como respeitamos |
 |---|---|---|---|
 | Workers | 100 mil requisições/dia | algumas centenas a poucos milhares/dia | folga grande |
-| Workers | **10 ms de CPU por requisição** (espera de rede/banco não conta) | renderizar telas, receber sincronização, servir fotos | contas pesadas no SQL do Neon; sincronização chega pronta do Apps Script; sem hash de senha (login Google); fotos já chegam reduzidas pelo navegador (Worker só repassa os bytes) |
-| Workers | 64 MiB de código, 128 MB de memória, 50 subrequisições | Next.js + Drizzle | Next.js 15/16 com runtime Node, sem libs pesadas no servidor |
+| Workers | **10 ms de CPU por requisição** (espera de rede/banco não conta) | só chamadas `/api/*`: consultas, sincronização, fotos | telas renderizam no navegador (arquivos estáticos não contam); contas pesadas no SQL do Neon; sincronização chega pronta do Apps Script; sem hash de senha (login Google); fotos já chegam reduzidas pelo navegador |
+| Workers | 64 MiB de código, 128 MB de memória, 50 subrequisições | API Hono + driver Neon | API pequena, sem libs pesadas |
+| Workers | arquivos estáticos | telas, JS, CSS, ícones | grátis e ilimitados; não acionam o Worker |
 | Neon Free | **1 GB de armazenamento por projeto** — passou disso, gravações são bloqueadas (inclusive a sincronização) | dados: poucas dezenas de MB; fotos: ~150 KB + miniatura ~25 KB cada | **teto de 700 MB para fotos** controlado pelo sistema (≈ 4 mil fotos); upload bloqueado ao atingir, com aviso a partir de 80% |
 | Neon Free | **5 GB/mês de tráfego de saída** — passou disso, o banco é suspenso até o mês virar | telas + exibição de fotos | listas usam só miniaturas; fotos com `Cache-Control: immutable` de 1 ano (navegador não baixa de novo); medidor de tráfego estimado na Governança |
 | Neon Free | 100 CU-horas/mês; banco "dorme" após 5 min sem uso | uso em horário comercial | 1º acesso após inatividade ~1 s mais lento |
 | Apps Script | gatilhos de tempo e UrlFetch com cota diária de conta Google | 144 execuções/dia (a cada 10 min) | bem abaixo da cota |
 
-Plano B, se a CPU de 10 ms se mostrar insuficiente nos testes da fase 2/3: Workers Paid (US$ 5/mês, 30 s de CPU). O código não muda.
+Plano B, se alguma rota da API passar de 10 ms de CPU com frequência: Workers Paid (US$ 5/mês, 30 s de CPU). O código não muda.
 
 ## Stack
-- Next.js (App Router, TypeScript, runtime Node) + `@opennextjs/cloudflare`; deploy com Wrangler
-- Tailwind CSS com `tokens.json` no tema; fontes Geist/Geist Mono
-- Drizzle ORM + `@neondatabase/serverless` (driver HTTP)
-- Auth.js com provedor Google (OAuth grátis no Google Cloud); acesso só para e-mails da planilha Corretores
+- **Telas:** React 19 + Vite + React Router 7, TypeScript; Tailwind CSS 4 com `tokens.json` no `@theme`; fontes Geist/Geist Mono (Google Fonts)
+- **API:** Hono no Cloudflare Worker (`worker/`), `@cloudflare/vite-plugin` para dev/build, deploy com Wrangler
+- **Banco:** `@neondatabase/serverless` (driver HTTP) com SQL direto; migrações em arquivos `.sql` versionados
+- **Login:** fluxo OAuth do Google implementado na própria API (`/api/auth/google` → `/api/auth/callback/google`, mesmo URI já cadastrado no Google Cloud); sessão em cookie `HttpOnly` assinado com HMAC (Web Crypto, barato em CPU); acesso só para e-mails da planilha Corretores
 - Fotos em `bytea` no Neon; redução/compressão no navegador (canvas → WebP) antes do envio
 - `zod` para validar linhas; Recharts para gráficos (renderizados no navegador)
 
@@ -39,11 +41,12 @@ Plano B, se a CPU de 10 ms se mostrar insuficiente nos testes da fase 2/3: Worke
                           lê as abas, converte em JSON, calcula hash, envia só o que mudou
                           │  POST /api/sync/<planilha>  (Authorization: Bearer SYNC_SECRET)
                           ▼
-Cloudflare Worker (Next.js) ── valida (zod) ── 1 comando SQL em lote (jsonb_to_recordset) ──▶ Neon
-     ▲  telas: consultas/KPIs agregados no SQL                                                 │
+Cloudflare Worker (API Hono) ── valida (zod) ── 1 comando SQL em lote (jsonb_to_recordset) ──▶ Neon
+     ▲  GET /api/... → JSON com KPIs já agregados no SQL                                          │
      └───────────────────────────────────────────────────────────────────────────────────────┘
+Navegador ◀── telas React (arquivos estáticos da Cloudflare, sem CPU do Worker) ── chama /api/*
 Fotos: navegador reduz a imagem (WebP 1280 px + miniatura 400 px) → POST /api/fotos → Worker grava bytea no Neon
-       exibição: /fotos/<id>-<hash>.webp servido pelo Worker lendo o Neon, cache de 1 ano no navegador
+       exibição: /api/fotos/<id>-<hash>.webp servido pelo Worker lendo o Neon, cache de 1 ano no navegador
 ```
 
 Por que o Apps Script lê as planilhas (em vez do Worker chamar a Sheets API):
@@ -57,7 +60,7 @@ Ajustes sugeridos (resolvem os "Pontos de atenção"): coluna `leadId` no Leads,
 
 ### Tabelas Neon
 - Espelho: `imoveis`, `agenciamentos`, `leads`, `atendimentos`, `contratos`, `fluxo_caixa`, `campanhas`, `corretores` — chaves naturais: code, agenciamentoId, telefone, activityId, contractId, entryId, nome. Cada linha guarda `sheet_row` e `synced_at`.
-- Do sistema: `imovel_fotos` (id, imovel_code, hash, ordem, capa, tamanho, `imagem bytea`, `miniatura bytea` — miniatura separada para as listas não lerem a foto grande), `sync_runs` (planilha, início, fim, hash, contagens, status), `sync_issues` (planilha, linha, coluna, problema), `audit_log` (data, usuário, ação, registro, detalhe — exportável em CSV), `sessions` do Auth.js.
+- Do sistema: `imovel_fotos` (id, imovel_code, hash, ordem, capa, tamanho, `imagem bytea`, `miniatura bytea` — miniatura separada para as listas não lerem a foto grande), `sync_runs` (planilha, início, fim, hash, contagens, status), `sync_issues` (planilha, linha, coluna, problema), `audit_log` (data, usuário, ação, registro, detalhe — exportável em CSV), `sessoes` (opcional; a sessão principal fica em cookie assinado).
 - Identificadores do sistema: `lead_ids` (telefone normalizado → `LEAD-0001`, sequencial, nunca reaproveitado) e `vinculos_manuais` (tipo `atendimento→lead` | `contrato→lead` | `lead→imovel` | `contrato→imovel`, chave do registro de origem, chave do alvo, usuário, data). As colunas `lead_id` e `codigo_imovel` das tabelas espelho são **preenchidas pelo sistema** a cada sincronização.
 
 ### Sincronização
@@ -76,7 +79,7 @@ Ajustes sugeridos (resolvem os "Pontos de atenção"): coluna `leadId` no Leads,
 ### Fotos
 - Upload só por Sócio/Gerente/Corretor na tela Imóveis. O navegador reduz para 1280 px (WebP qualidade ~0,75, alvo ≤ 200 KB) e gera miniatura de 400 px (~25 KB) antes de enviar — dispensa serviço pago de otimização (`next/image` com `unoptimized`).
 - `POST /api/fotos`: confere perfil, tipo (só WebP gerado pelo navegador) e tamanho (rejeita > 300 KB), confere o teto de 700 MB (`sum(tamanho)`) e grava numa transação. Limite de 15 fotos por imóvel.
-- `GET /fotos/<id>-<hash>.webp` (e `/miniaturas/...`): Worker lê só a coluna pedida e responde com `Cache-Control: public, max-age=31536000, immutable`; o hash na URL garante que foto trocada gera URL nova.
+- `GET /api/fotos/<id>-<hash>.webp` (e `/api/miniaturas/...`): Worker lê só a coluna pedida e responde com `Cache-Control: public, max-age=31536000, immutable`; o hash na URL garante que foto trocada gera URL nova.
 - Excluir foto remove a linha; o espaço volta para o teto do sistema (o Neon recupera o espaço automaticamente com o tempo).
 - Governança mostra: espaço usado por fotos / 700 MB, nº de fotos e estimativa de tráfego do mês.
 - Se no futuro o espaço não bastar: mover fotos para um 2º projeto Neon (Object Storage, 5 GB grátis) sem mudar as telas, só a rota `/fotos`.
@@ -99,8 +102,8 @@ Permissões aplicadas **no servidor** (middleware + checagem em cada rota/consul
 Endereço: `crm.imobiinsight.workers.dev` (Worker `crm`, grátis). Domínio próprio é opcional (~R$ 40/ano no Registro.br).
 
 ## Fases
-0. **Fundação** — extrair pacote para `docs/pacote/`, criar app Next.js + OpenNext, deploy "olá mundo" no Workers (valida o ambiente grátis cedo), Tailwind com tokens, layout (sidebar 232px, header 68px), componentes base (Button, Chip, Badge de status, KpiCard, Table, EmptyState, Toast, BarH, Timeline). `.env.example` / `wrangler.jsonc`.
-1. **Banco + login** — schema Drizzle, migrações no Neon, Auth.js com Google, checagem do e-mail na tabela `corretores`, perfis e middleware.
+0. **Fundação** — extrair pacote para `docs/pacote/`, criar app React (Vite) + API Hono no Workers, deploy no ar (valida o ambiente grátis cedo, incluindo a medição de CPU), Tailwind com tokens, layout (sidebar 232px, header 68px), componentes base (Button, Chip, Badge de status, KpiCard, Table, EmptyState, Toast, BarH, Timeline). `.dev.vars.example` / `wrangler.jsonc`, páginas de privacidade e termos.
+1. **Banco + login** — schema Drizzle, migrações no Neon, login Google na API, checagem do e-mail na tabela `corretores`, perfis e middleware.
 2. **Sincronização** — Apps Script (leitura, hash, envio em lotes, gatilho, menu, Web App), rota `/api/sync/[planilha]`, validadores zod, normalizadores, espelho, `sync_runs`/`sync_issues`. **Medir CPU por requisição** (`wrangler tail`) com os CSVs de exemplo.
 3. **Telas comerciais** — Dashboard, Leads, Funil, Detalhe do lead, busca e filtros. Medir CPU das telas.
 4. **Imóveis e agenciamentos** — grade com fotos (redução no navegador, gravação em `bytea` no Neon, teto de 700 MB, cache imutável), Agenciamentos (KPIs, 6 meses, roleta), Corretores.

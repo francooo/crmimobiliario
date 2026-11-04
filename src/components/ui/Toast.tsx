@@ -1,5 +1,3 @@
-"use client";
-
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 
 const ToastCtx = createContext<(msg: string) => void>(() => {});
