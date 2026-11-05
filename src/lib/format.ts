@@ -15,10 +15,32 @@ export function moneyShort(v: number) {
 }
 
 /** "2026-10-28" ou "2026-10-28 10:30" → "28/10" */
-export function dayMonth(iso: string) {
+export function dayMonth(iso: string | null | undefined) {
+  if (!iso) return "—";
   const [d] = iso.split(" ");
   const [, m, day] = d.split("-");
   return `${day}/${m}`;
+}
+
+/** "2026-10-28 10:30" → "28/10 10:30" */
+export function dayMonthTime(iso: string | null | undefined) {
+  if (!iso) return "—";
+  const [d, t] = iso.split(" ");
+  return t ? `${dayMonth(d!)} ${t.slice(0, 5)}` : dayMonth(d!);
+}
+
+/** "2026-10-28" → "28/10/2026" */
+export function fullDate(iso: string | null | undefined) {
+  if (!iso) return "—";
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return `${d}/${m}/${y}`;
+}
+
+/** Variação percentual com sinal: +12% / −8% (null se não há base) */
+export function variacao(atual: number, anterior: number | null | undefined): string | null {
+  if (!anterior) return null;
+  const v = Math.round((atual / anterior - 1) * 100);
+  return `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v)}%`;
 }
 
 /** "51999990001" → "(51) 99999-0001" */

@@ -1,36 +1,62 @@
-import { Link } from "react-router";
+import { Link, Navigate, useSearchParams } from "react-router";
+import { googleLoginUrl, useAuth } from "@/lib/auth";
 import { usePageTitle } from "@/lib/usePageTitle";
 
+const ERRORS: Record<string, string> = {
+  "nao-autorizado": "Este e-mail não está cadastrado na planilha de Corretores. Peça a liberação a um sócio.",
+  inativo: "Seu acesso está desativado na planilha de Corretores.",
+  cancelado: "O login com Google foi cancelado.",
+  "sessao-expirada": "A tentativa de login expirou. Tente novamente.",
+  "email-nao-verificado": "O e-mail desta conta Google não está verificado.",
+  google: "Não foi possível concluir o login com o Google. Tente novamente.",
+};
 
-// Login em duas colunas (painel escuro da marca + formulário). O botão Google é ligado na fase 1.
+/** Aceita só caminhos internos, para não virar redirecionamento aberto */
+function safePath(p: string | null) {
+  return p && p.startsWith("/") && !p.startsWith("//") ? p : "/";
+}
+
+// Login em duas colunas (painel escuro da marca + formulário)
 export function LoginPage() {
   usePageTitle("Entrar");
+  const [params] = useSearchParams();
+  const auth = useAuth();
+  const voltar = safePath(params.get("voltar"));
+  const erro = params.get("erro");
+
+  if (auth.status === "authenticated") return <Navigate to={voltar} replace />;
+
   return (
     <div className="grid min-h-screen grid-cols-1 bg-bg md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-      <div className="flex flex-col justify-between gap-10 bg-primary px-14 py-12 text-bg">
+      <div className="flex flex-col justify-between gap-6 bg-primary px-6 py-8 text-bg md:gap-10 md:px-14 md:py-12">
         <div className="text-[24px] font-bold tracking-[-0.6px]">ImobiInsight</div>
         <div className="flex max-w-[520px] flex-col gap-[18px]">
-          <div className="text-[44px] font-semibold leading-[1.05] tracking-[-1.4px]">Gestão comercial e inteligência</div>
+          <div className="text-[32px] font-semibold leading-[1.05] tracking-[-1.2px] md:text-[44px] md:tracking-[-1.4px]">Gestão comercial e inteligência</div>
           <div className="text-[17px] leading-normal text-login-muted">
             Leads, atendimentos, agenciamentos e resultados financeiros reunidos em um só painel.
           </div>
         </div>
         <div className="h-[15px]" />
       </div>
-      <div className="flex items-center justify-center p-10">
+      <div className="flex items-center justify-center px-6 py-10 md:p-10">
         <div className="flex w-full max-w-[380px] flex-col gap-[22px]">
           <div className="flex flex-col gap-[6px]">
             <div className="text-[28px] font-semibold tracking-[-0.8px]">Entrar</div>
             <div className="text-[15px] text-muted-2">Acesse com a conta Google cadastrada pela imobiliária.</div>
           </div>
-          <button
-            type="button"
-            disabled
-            className="flex h-12 items-center justify-center gap-3 rounded-input border border-border-strong bg-surface text-[15px] font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-60"
+          {erro && (
+            <div role="alert" className="rounded-[8px] bg-danger-bg px-3 py-[9px] text-[13.5px] text-danger">
+              {ERRORS[erro] ?? ERRORS.google}
+            </div>
+          )}
+          {/* Navegação completa (não SPA): o Worker redireciona para o Google */}
+          <a
+            href={googleLoginUrl(voltar)}
+            className="flex h-12 items-center justify-center gap-3 rounded-input border border-border-strong bg-surface text-[15px] font-semibold text-ink no-underline hover:bg-row-hover hover:text-ink"
           >
             <GoogleIcon />
             Entrar com Google
-          </button>
+          </a>
           <div className="border-t border-border pt-4 text-[13px] leading-normal text-muted-2">
             O acesso é liberado para os e-mails cadastrados na planilha de Corretores. O perfil (sócio, gerente, administrativo ou
             corretor) define quais módulos aparecem após o login.

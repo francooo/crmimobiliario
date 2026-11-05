@@ -9,7 +9,18 @@
     "preview": "vite build && vite preview",
     "deploy": "vite build && wrangler deploy",
     "typecheck": "tsc -b",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:status": "node scripts/migrate.mjs --status",
+    "db:tables": "node scripts/db-tables.mjs",
+    "test": "vitest run --config vitest.config.ts",
+    "db:resumo": "node scripts/db-resumo.mjs",
+    "sync:csv": "node scripts/sync-csv.mjs",
+    "build:apps-script": "esbuild worker/sync/apps-script-entry.ts --bundle --format=iife --global-name=ImobiSync --target=es2019 --charset=utf8 --legal-comments=none --banner:js=\"// GERADO por npm run build:apps-script a partir de worker/sync/schema.ts — não edite à mão.\" --outfile=scripts/apps-script/Validacao.gs",
+    "db:limpar": "node scripts/db-limpar-espelho.mjs",
+    "test:integracao": "node tests/integracao/run.mjs",
+    "db:papel-app": "node scripts/db-papel-app.mjs",
+    "db:backup": "node scripts/db-backup.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
@@ -26,6 +37,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.2.1",
+    "esbuild": "^0.28.2",
     "tailwindcss": "^4.3.4",
     "typescript": "^5.9.3",
     "vite": "^8.3.5",

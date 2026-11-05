@@ -18,3 +18,9 @@
 - Segredos só em `.dev.vars` (local) e `npx wrangler secret put` (produção). Nunca versionar `client_secret*.json` nem `.dev.vars`.
 - Textos da interface em português do Brasil; datas DD/MM e valores em R$.
 - Visual segue `docs/pacote/design-system/` (tokens no `@theme` de `src/index.css`).
+
+## Testes e operação
+- `npm test` (unitários, vitest) · `npm run preview` + `npm run test:integracao` (integração; só roda com o banco `neondb_dev`).
+- Guia de operação: `docs/OPERACAO.md`. Backup do que só existe no sistema: `npm run db:backup -- --producao`.
+- Scripts de banco usam o dono (`DATABASE_URL_ADMIN` / `DATABASE_URL_PRODUCAO`); o Worker deve usar o usuário `crm_app` (`npm run db:papel-app`).
+- Ao mudar `worker/sync/schema.ts`: `npm run build:apps-script` e colar o novo `Validacao.gs` no Apps Script.

@@ -1,24 +1,6 @@
-// Perfis e módulos — docs/pacote/REGRAS-DE-NEGOCIO.md §1
-export type Role = "socio" | "locacoes" | "admin" | "corretor";
+import { canAccess, type ModuleKey, type Role } from "../../shared/permissions";
 
-export const ROLE_NAME: Record<Role, string> = {
-  socio: "Sócio / Gestor",
-  locacoes: "Gerente de locações",
-  admin: "Administrativo",
-  corretor: "Corretor",
-};
-
-export type ModuleKey =
-  | "dashboard"
-  | "leads"
-  | "funil"
-  | "imoveis"
-  | "agenciamentos"
-  | "corretores"
-  | "marketing"
-  | "financeiro"
-  | "sincronizacao"
-  | "governanca";
+export { canAccess, ROLE_NAME, type ModuleKey, type Role } from "../../shared/permissions";
 
 export const MODULES: Record<ModuleKey, { label: string; href: string }> = {
   dashboard: { label: "Dashboard", href: "/" },
@@ -38,19 +20,6 @@ export const NAV_GROUPS: { label: string; items: ModuleKey[] }[] = [
   { label: "Gestão", items: ["corretores", "marketing", "financeiro"] },
   { label: "Administração", items: ["sincronizacao", "governanca"] },
 ];
-
-/** null = todos os módulos */
-const ROLE_ALLOWED: Record<Role, ModuleKey[] | null> = {
-  socio: null,
-  locacoes: ["leads", "funil", "imoveis", "agenciamentos", "corretores", "governanca"],
-  admin: ["agenciamentos", "financeiro", "sincronizacao", "governanca"],
-  corretor: ["leads", "funil", "imoveis", "agenciamentos", "governanca"],
-};
-
-export function canAccess(role: Role, module: ModuleKey): boolean {
-  const allowed = ROLE_ALLOWED[role];
-  return allowed === null || allowed.includes(module);
-}
 
 export function navFor(role: Role) {
   return NAV_GROUPS.map((g) => ({

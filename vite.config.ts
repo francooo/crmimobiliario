@@ -9,6 +9,9 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
+  // Porta 3000: é a origem cadastrada no Google Cloud para o login local
+  server: { port: 3000, strictPort: true },
+  preview: { port: 3000, strictPort: true },
   environments: {
     worker: { build: { sourcemap: true } },
   },

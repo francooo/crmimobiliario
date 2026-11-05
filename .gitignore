@@ -24,3 +24,6 @@ cloudflare-env.d.ts
 .DS_Store
 Thumbs.db
 *.log
+
+# Cópias de segurança locais (fotos e dados do sistema)
+backups/
