@@ -1,0 +1,29 @@
+# Segredos — nunca versionar
+client_secret*.json
+*.pem
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# Dependências e build
+node_modules/
+.next/
+.open-next/
+.wrangler/
+dist/
+out/
+
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+cloudflare-env.d.ts
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Cópias de segurança locais (fotos e dados do sistema)
+backups/

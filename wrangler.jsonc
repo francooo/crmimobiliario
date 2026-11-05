@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Publicado em https://crm.imobiinsight.workers.dev (plano Free, sem cartão)
+  "name": "crm",
+  "account_id": "d3140ad74f62a6fc2bd1dbd246f41c4e",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "upload_source_maps": true,
+  "assets": {
+    // Telas (React) são arquivos estáticos: servidos sem acionar o Worker (sem custo de CPU).
+    // Rotas desconhecidas devolvem index.html para o React Router.
+    "not_found_handling": "single-page-application",
+    // Só /api/* executa o Worker.
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    // Entram como Sócio mesmo antes da 1ª sincronização da planilha Corretores
+    "ADMIN_EMAILS": "andrewsfranco93@gmail.com"
+  }
+  // Segredos (não ficam aqui): DATABASE_URL, AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, SYNC_SECRET
+  // Local: .dev.vars   ·   Produção: npx wrangler secret put <NOME>
+}
