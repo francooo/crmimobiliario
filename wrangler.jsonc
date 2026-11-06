@@ -20,8 +20,9 @@
     "enabled": true
   },
   "vars": {
-    // Entram como Sócio mesmo antes da 1ª sincronização da planilha Corretores
-    "ADMIN_EMAILS": "andrewsfranco93@gmail.com"
+    // Entram como Sócio / Gestor (acesso total) quando o e-mail não está na planilha Corretores.
+    // andrewsfranco93@gmail.com — Andrews Franco · dtg.demetrius@gmail.com — Demetrius (sócio/gestor)
+    "ADMIN_EMAILS": "andrewsfranco93@gmail.com,dtg.demetrius@gmail.com"
   }
   // Segredos (não ficam aqui): DATABASE_URL, AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, SYNC_SECRET
   // Local: .dev.vars   ·   Produção: npx wrangler secret put <NOME>
